@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { randomUUID } from "node:crypto";
-import { replayMission } from "../../../../../src/mission-replay.js";
-import { supabaseEventStore } from "../../../../../src/event-store.js";
-import type { ActorType, DomainEvent, UUID } from "../../../../../src/domain-events.js";
+import { replayMission } from "@/src/mission-replay";
+import { supabaseEventStore } from "@/src/event-store";
+import type { ActorType, DomainEvent, UUID } from "@/src/domain-events";
 
 export const runtime = "nodejs";
 

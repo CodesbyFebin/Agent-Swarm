@@ -1,2 +1,2 @@
-export * from "./domain-events.js";
-export * from "./mission-replay.js";
+export * from "./domain-events";
+export * from "./mission-replay";

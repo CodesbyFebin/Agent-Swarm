@@ -1,5 +1,5 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import type { AnyDomainEvent, EventStream, UUID } from "./domain-events.js";
+import type { AnyDomainEvent, EventStream, UUID } from "./domain-events";
 
 export type EventStore = {
   append(events: EventStream): Promise<void>;

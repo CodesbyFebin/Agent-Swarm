@@ -1,0 +1,10 @@
+@import "tailwindcss";
+
+@theme inline { --font-sans: var(--font-geist); --font-mono: var(--font-mono); --color-background: #07070c; --color-foreground: #eaeaf2; --color-card: #0e0e16; --color-card-foreground: #eaeaf2; --color-muted: #8a8aa2; --color-border: #262636; --color-primary: #ff5a1f; --color-primary-foreground: #fff; --color-success: #22c55e; --color-info: #3b82f6; --color-warning: #f59e0b; --radius: .6rem; }
+:root { color-scheme: dark; }
+* { box-sizing: border-box; }
+html, body { min-height: 100%; }
+body { margin: 0; background: #07070c; color: #eaeaf2; font-family: var(--font-geist), system-ui, sans-serif; }
+button, input, textarea { font: inherit; }
+button { cursor: pointer; }
+::selection { background: #ff5a1f; color: white; }

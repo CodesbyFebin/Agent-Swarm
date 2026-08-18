@@ -1,4 +1,4 @@
-import { AnyDomainEvent, EventStream, UUID, validateStream } from "./domain-events.js";
+import { AnyDomainEvent, EventStream, UUID, validateStream } from "./domain-events";
 
 export type MissionStatus = "created" | "planning" | "running" | "paused" | "verifying" | "completed" | "failed" | "cancelled";
 export type TaskStatus = "created" | "ready" | "running" | "completed" | "failed";
