@@ -1,0 +1,18 @@
+app = "agentswarm-worker"
+primary_region = "bom"
+
+[build]
+  dockerfile = "apps/worker/Dockerfile"
+
+[env]
+  NODE_ENV = "production"
+  WORKER_ID = "worker-fly-1"
+  WORKER_FALLBACK_POLL_MS = "5000"
+  WORKER_CONCURRENCY = "4"
+  TASK_LEASE_SECONDS = "90"
+  MAX_TASK_ATTEMPTS = "3"
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 256
