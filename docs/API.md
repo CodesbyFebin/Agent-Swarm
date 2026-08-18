@@ -8,7 +8,7 @@ All routes except `/health`, `/auth/signup`, and `/auth/login` require a valid `
 
 `GET /health`
 
-Returns actual backend/database/provider configuration state.
+Returns actual backend/database/provider/queue configuration state: `{ status, database, qwen, redis }`. `redis` is `UNAVAILABLE` if `REDIS_URL` isn't set, `LIVE` if a real ping succeeded, `ERROR` if configured but unreachable — the worker still functions correctly in all three cases via its Postgres fallback poll, just with higher dispatch latency when Redis is down.
 
 ## Auth
 

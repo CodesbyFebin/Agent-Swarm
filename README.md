@@ -37,7 +37,7 @@ The UI never guesses token usage or cost. If Qwen does not return usage, it is s
 ## Requirements
 
 - Node.js 20+
-- Docker (for local PostgreSQL)
+- Docker (for local PostgreSQL + Redis) — or local installs of both; the stack was developed and verified against Homebrew-installed Postgres 17 and Redis 8, no Docker required
 - A Qwen / Alibaba Cloud Model Studio API key and OpenAI-compatible base URL for live model execution
 
 ## Quick start
@@ -102,6 +102,20 @@ Optional states: `WAITING_APPROVAL`, `RETRY_WAIT`, `FAILED`, `CANCELLED`, `DEAD_
 
 Leases are persisted in PostgreSQL; expired leases are recovered by the worker. Retries are bounded by `MAX_TASK_ATTEMPTS`.
 
+## Durable dispatch (Redis/BullMQ + Postgres)
+
+Postgres remains the **sole source of mission/task truth** — this was true before Redis existed in this stack and hasn't changed. `FOR UPDATE SKIP LOCKED` is what actually decides which worker process claims a given mission or task; it's safe for any number of concurrent workers by construction.
+
+Redis/BullMQ adds a low-latency **wake-up signal** on top of that, nothing more:
+
+- After a Postgres transaction commits (mission created, task promoted to `READY`, a retry/lease-expiry recovery, an approval granted), the API/worker enqueues a lightweight BullMQ job.
+- The worker's `Worker` consumer reacts to jobs by attempting the same claim-and-process logic — the job payload is a *hint*, not an instruction, so a stale, duplicate, or dropped job can never cause duplicate or incorrect execution.
+- A slow fallback poll (`WORKER_FALLBACK_POLL_MS`, default 5s) always runs independently of Redis, sweeping for retry-wait tasks, expired leases, and anything the queue missed.
+- `enqueue()` is timeout-bounded (1.5s) and never holds an open Postgres client while it runs — verified by actually killing Redis mid-request and confirming the API responds in ~1.6s instead of hanging, and that a mission created during the outage still reaches `BLOCKED`/`COMPLETED`/etc. via the fallback poll alone.
+- If `REDIS_URL` is unset, the worker runs in **Postgres-poll-only mode** — same correctness, just higher dispatch latency (up to `WORKER_FALLBACK_POLL_MS`).
+
+This was verified end-to-end, not just written: mission creation during a real Redis outage, worker process killed and restarted mid-backlog (confirmed exactly one `mission.planning_started` event afterward — no duplicate processing), and Redis restarted and confirmed to reconnect automatically without a worker restart.
+
 ## Realtime architecture
 
 Every runtime event is inserted into the `events` table. A PostgreSQL trigger sends a `NOTIFY`; the API's SSE endpoint listens and streams matching events to connected clients. Reconnecting clients pass the last event ID and receive missed events from the durable event store.
@@ -145,4 +159,4 @@ See [`docs/API.md`](docs/API.md).
 
 ## Current production boundary
 
-This is a fully wired **mission/API/model/event/artifact MVP with real auth and org/project tenancy**, not the final enterprise control plane. Before exposing it publicly, still needed: OAuth/SSO, org invites, secret-vault integration (secrets currently come from server `.env` only), tool/MCP gateway, sandboxed task execution, richer verification gates (build/typecheck/security/a11y — today's gate only checks artifact existence), audit ledger, and deployment hardening (CSRF tokens, security headers, production TLS).
+This is a fully wired **mission/API/model/event/artifact MVP with real auth, org/project tenancy, and durable Redis/Postgres dispatch**, not the final enterprise control plane. Before exposing it publicly, still needed: OAuth/SSO, org invites, secret-vault integration (secrets currently come from server `.env` only), tool/MCP gateway, sandboxed task execution, richer verification gates (build/typecheck/security/a11y — today's gate only checks artifact existence), audit ledger, and deployment hardening (CSRF tokens, security headers, production TLS).

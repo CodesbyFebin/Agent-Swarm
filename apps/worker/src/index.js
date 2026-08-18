@@ -2,9 +2,11 @@ import 'dotenv/config';
 import { z } from 'zod';
 import { pool, emitEvent } from './db.js';
 import { qwenChat, qwenConfigured } from './qwen.js';
+import { enqueue, startQueueWorker, redisConfigured } from './queue.js';
 
 const WORKER_ID = process.env.WORKER_ID || `worker-${process.pid}`;
-const POLL_MS = Number(process.env.WORKER_POLL_MS || 750);
+const FALLBACK_POLL_MS = Number(process.env.WORKER_FALLBACK_POLL_MS || 5000);
+const WORKER_CONCURRENCY = Number(process.env.WORKER_CONCURRENCY || 4);
 const LEASE_SECONDS = Number(process.env.TASK_LEASE_SECONDS || 90);
 const MAX_ATTEMPTS = Number(process.env.MAX_TASK_ATTEMPTS || 3);
 const AGENTS = ['planner','researcher','architect','backend','frontend','qa','security','devops'];
@@ -81,6 +83,7 @@ async function planMission(mission) {
     ]);
     const plan = planSchema.parse(extractJson(result.content));
     const client = await pool.connect();
+    const readyTaskIds = [];
     try {
       await client.query('BEGIN');
       for (const t of plan.tasks) {
@@ -91,12 +94,16 @@ async function planMission(mission) {
           [mission.id, t.key, t.title, t.agent, JSON.stringify(t.dependencies), t.requiresApproval, t.risk, initial]
         );
         await emitEvent(client, { missionId: mission.id, taskId: rows[0].id, type: 'task.created', actor: 'planner', payload: { key: t.key, title: t.title, agent: t.agent, dependencies: t.dependencies, provenance: 'LIVE' } });
-        if (initial === 'READY') await emitEvent(client, { missionId: mission.id, taskId: rows[0].id, type: 'task.ready', actor: 'scheduler', payload: { provenance: 'LIVE' } });
+        if (initial === 'READY') {
+          await emitEvent(client, { missionId: mission.id, taskId: rows[0].id, type: 'task.ready', actor: 'scheduler', payload: { provenance: 'LIVE' } });
+          readyTaskIds.push(rows[0].id);
+        }
       }
       await client.query(`UPDATE missions SET status='RUNNING', provider_status='LIVE', updated_at=now() WHERE id=$1`, [mission.id]);
       await emitEvent(client, { missionId: mission.id, type: 'mission.planned', actor: 'planner', payload: { taskCount: plan.tasks.length, provider: result.provider, model: result.model, inputTokens: result.inputTokens, outputTokens: result.outputTokens, latencyMs: result.latencyMs, provenance: 'LIVE' } });
       await client.query('COMMIT');
     } catch (e) { await client.query('ROLLBACK'); throw e; } finally { client.release(); }
+    for (const id of readyTaskIds) await enqueue('task', id);
   } catch (e) {
     await pool.query(`UPDATE missions SET status='FAILED', provider_status='ERROR', provider_error=$2, completed_at=now(), updated_at=now() WHERE id=$1`, [mission.id, e.message]);
     await emitEvent(pool, { missionId: mission.id, type: 'mission.failed', actor: 'planner', payload: { error: e.message, provenance: 'LIVE' } });
@@ -109,7 +116,10 @@ async function recoverRetries() {
      WHERE status='RETRY_WAIT' AND retry_at IS NOT NULL AND retry_at <= now()
      RETURNING *`
   );
-  for (const t of rows) await emitEvent(pool, { missionId: t.mission_id, taskId: t.id, type: 'task.ready', actor: 'scheduler', payload: { retry: true, provenance: 'LIVE' } });
+  for (const t of rows) {
+    await emitEvent(pool, { missionId: t.mission_id, taskId: t.id, type: 'task.ready', actor: 'scheduler', payload: { retry: true, provenance: 'LIVE' } });
+    await enqueue('task', t.id);
+  }
 }
 
 async function recoverExpiredLeases() {
@@ -119,7 +129,10 @@ async function recoverExpiredLeases() {
      WHERE status IN ('LEASED','RUNNING') AND leased_until < now()
      RETURNING *`, [MAX_ATTEMPTS]
   );
-  for (const t of rows) await emitEvent(pool, { missionId: t.mission_id, taskId: t.id, type: t.status === 'DEAD_LETTER' ? 'task.dead_letter' : 'task.lease_expired', actor: 'scheduler', payload: { attemptCount: t.attempt_count, provenance: 'LIVE' } });
+  for (const t of rows) {
+    await emitEvent(pool, { missionId: t.mission_id, taskId: t.id, type: t.status === 'DEAD_LETTER' ? 'task.dead_letter' : 'task.lease_expired', actor: 'scheduler', payload: { attemptCount: t.attempt_count, provenance: 'LIVE' } });
+    if (t.status === 'READY') await enqueue('task', t.id);
+  }
 }
 
 async function claimTask() {
@@ -237,16 +250,19 @@ async function executeTask(task) {
 async function promoteReady(missionId) {
   const { rows } = await pool.query(`SELECT id, task_key, dependencies, status FROM tasks WHERE mission_id=$1`, [missionId]);
   const succeeded = new Set(rows.filter(r => r.status === 'SUCCEEDED').map(r => r.task_key));
+  const readyIds = [];
   for (const t of rows.filter(r => r.status === 'QUEUED')) {
     const deps = Array.isArray(t.dependencies) ? t.dependencies : JSON.parse(t.dependencies || '[]');
     if (deps.every(d => succeeded.has(d))) {
       await pool.query(`UPDATE tasks SET status='READY' WHERE id=$1 AND status='QUEUED'`, [t.id]);
       await emitEvent(pool, { missionId, taskId: t.id, type: 'task.ready', actor: 'scheduler', payload: { provenance: 'LIVE' } });
+      readyIds.push(t.id);
     }
   }
   const summary = await pool.query(`SELECT count(*)::int total, count(*) FILTER (WHERE status='SUCCEEDED')::int succeeded FROM tasks WHERE mission_id=$1`, [missionId]);
   const { total, succeeded: done } = summary.rows[0];
   await pool.query(`UPDATE missions SET progress=$2, updated_at=now() WHERE id=$1`, [missionId, total ? Math.round((done / total) * 100) : 0]);
+  for (const id of readyIds) await enqueue('task', id);
 }
 
 async function maybeFinishMission(missionId) {
@@ -268,18 +284,46 @@ async function maybeFinishMission(missionId) {
   } catch (e) { await client.query('ROLLBACK'); throw e; } finally { client.release(); }
 }
 
+/** One unit of dispatchable work: claim+plan a mission, or claim+execute a task. */
+async function tryClaimAndProcessOne() {
+  const mission = await claimQueuedMission();
+  if (mission) { await planMission(mission); return true; }
+  const task = await claimTask();
+  if (task) { await executeTask(task); return true; }
+  return false;
+}
+
+async function drainAvailableWork(maxIterations = 50) {
+  for (let i = 0; i < maxIterations; i++) {
+    const did = await tryClaimAndProcessOne();
+    if (!did) break;
+  }
+}
+
 async function main() {
-  console.log(`[AgentSwarm worker] ${WORKER_ID} started; Qwen=${qwenConfigured() ? 'CONFIGURED' : 'UNAVAILABLE'}`);
+  const queueMode = redisConfigured();
+  console.log(`[AgentSwarm worker] ${WORKER_ID} started; Qwen=${qwenConfigured() ? 'CONFIGURED' : 'UNAVAILABLE'}; dispatch=${queueMode ? 'BullMQ+Postgres-fallback' : 'Postgres-poll-only'}`);
+
+  // BullMQ is a low-latency wake-up signal only. Postgres FOR UPDATE SKIP LOCKED
+  // remains the sole authority on which worker claims a given mission/task, so
+  // this is safe to run concurrently with the fallback poll below without any
+  // risk of duplicate execution.
+  startQueueWorker(tryClaimAndProcessOne, {
+    concurrency: WORKER_CONCURRENCY,
+    onError: (err) => console.error('[worker] queue error', err)
+  });
+
+  // Fallback sweep — always runs, queue or no queue. Recovers retry-wait tasks
+  // and expired leases (not queue-triggered events), and drains any work the
+  // queue missed (Redis down at enqueue time, Redis restart, or REDIS_URL
+  // unset entirely, in which case this is the only dispatch path).
   for (;;) {
     try {
       await recoverRetries();
       await recoverExpiredLeases();
-      const mission = await claimQueuedMission();
-      if (mission) { await planMission(mission); continue; }
-      const task = await claimTask();
-      if (task) { await executeTask(task); continue; }
+      await drainAvailableWork();
     } catch (e) { console.error('[worker]', e); }
-    await sleep(POLL_MS);
+    await sleep(FALLBACK_POLL_MS);
   }
 }
 

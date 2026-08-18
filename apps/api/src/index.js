@@ -11,6 +11,7 @@ import {
   SESSION_COOKIE, hashPassword, verifyPassword, createSession, destroySession,
   membershipsForUser, requireAuth, hasRole, slugify
 } from './auth.js';
+import { enqueue, pingRedis, redisConfigured } from './queue.js';
 
 const app = Fastify({ logger: true });
 await app.register(cors, {
@@ -147,7 +148,8 @@ app.get('/health', async () => {
   let db = 'ERROR';
   try { await pool.query('SELECT 1'); db = 'LIVE'; } catch {}
   const qwen = process.env.QWEN_API_KEY && process.env.QWEN_BASE_URL ? 'CONFIGURED' : 'UNAVAILABLE';
-  return { service: 'agentswarm-api', status: db === 'LIVE' ? 'LIVE' : 'DEGRADED', database: db, qwen };
+  const redis = redisConfigured() ? ((await pingRedis()) ? 'LIVE' : 'ERROR') : 'UNAVAILABLE';
+  return { service: 'agentswarm-api', status: db === 'LIVE' ? 'LIVE' : 'DEGRADED', database: db, qwen, redis };
 });
 
 // ── Missions ─────────────────────────────────────────────────────────────
@@ -182,6 +184,7 @@ app.post('/api/missions', { preHandler: requireAuth }, async (req, reply) => {
   const project = proj.rows[0];
   if (!hasRole(req.memberships, project.organization_id, 'MEMBER')) return reply.code(403).send({ error: 'INSUFFICIENT_ROLE' });
   const client = await pool.connect();
+  let mission;
   try {
     await client.query('BEGIN');
     const { rows } = await client.query(
@@ -189,15 +192,16 @@ app.post('/api/missions', { preHandler: requireAuth }, async (req, reply) => {
        VALUES ($1,$2,'QUEUED','UNKNOWN',$3,$4,$5) RETURNING *`,
       [parsed.data.goal, parsed.data.mode, project.organization_id, project.id, req.user.id]
     );
-    const mission = rows[0];
+    mission = rows[0];
     await emitEvent(client, { missionId: mission.id, type: 'mission.created', actor: req.user.email, payload: { mode: mission.mode, provenance: 'LIVE' } });
     await emitEvent(client, { missionId: mission.id, type: 'mission.queued', payload: { provenance: 'LIVE' } });
     await client.query('COMMIT');
-    return reply.code(201).send(await getMissionAggregate(mission.id));
   } catch (err) {
     await client.query('ROLLBACK');
     throw err;
   } finally { client.release(); }
+  await enqueue('mission', mission.id);
+  return reply.code(201).send(await getMissionAggregate(mission.id));
 });
 
 app.get('/api/missions/:id', { preHandler: requireAuth }, async (req, reply) => {
@@ -227,6 +231,7 @@ app.post('/api/missions/:id/resume', { preHandler: requireAuth }, async (req, re
   );
   if (!rows.length) return reply.code(409).send({ error: 'INVALID_STATE_TRANSITION' });
   await emitEvent(pool, { missionId: mission.id, type: 'mission.resumed', actor: req.user.email, payload: { provenance: 'LIVE' } });
+  await enqueue('mission', mission.id);
   return getMissionAggregate(mission.id);
 });
 
@@ -266,13 +271,14 @@ app.get('/api/approvals', { preHandler: requireAuth }, async (req) => {
 
 async function decideApproval(req, id, status, note) {
   const client = await pool.connect();
+  let ap;
   try {
     await client.query('BEGIN');
     const { rows } = await client.query(
       `SELECT a.*, m.organization_id FROM approvals a JOIN missions m ON m.id=a.mission_id WHERE a.id=$1 FOR UPDATE`,
       [id]
     );
-    const ap = rows[0];
+    ap = rows[0];
     const orgIds = req.memberships.map((m) => m.organization_id);
     if (!ap || !orgIds.includes(ap.organization_id)) throw Object.assign(new Error('APPROVAL_NOT_FOUND'), { statusCode: 404 });
     if (!hasRole(req.memberships, ap.organization_id, 'OPERATOR')) throw Object.assign(new Error('INSUFFICIENT_ROLE'), { statusCode: 403 });
@@ -287,8 +293,9 @@ async function decideApproval(req, id, status, note) {
     }
     await emitEvent(client, { missionId: ap.mission_id, taskId: ap.task_id, type: status === 'APPROVED' ? 'approval.granted' : 'approval.rejected', actor: req.user.email, payload: { approvalId: id, note: note || null, provenance: 'LIVE' } });
     await client.query('COMMIT');
-    return getMissionAggregate(ap.mission_id);
   } catch (e) { await client.query('ROLLBACK'); throw e; } finally { client.release(); }
+  if (status === 'APPROVED') await enqueue('task', ap.task_id);
+  return getMissionAggregate(ap.mission_id);
 }
 
 app.post('/api/approvals/:id/approve', { preHandler: requireAuth }, async (req, reply) => {
