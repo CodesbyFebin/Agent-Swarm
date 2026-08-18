@@ -117,7 +117,21 @@ Planner output is parsed and validated with Zod before task records are created.
 
 ## Approval gates
 
-A task can declare `requiresApproval` and a risk level. The worker creates a persisted approval request and stops the task in `WAITING_APPROVAL`. The API is authoritative for approve/reject actions. Approval resumes the task; rejection fails the mission.
+A task can declare `requiresApproval` and a risk level. The worker creates a persisted approval request and stops the task in `WAITING_APPROVAL`. The API is authoritative for approve/reject actions; deciding requires `OPERATOR` role or above in the mission's organization. Approval resumes the task; rejection fails the mission.
+
+## Auth & tenancy
+
+Real, DB-backed authentication — no fabricated "logged in" state:
+
+- Passwords hashed with bcrypt (`bcryptjs`, cost 12). Sessions are opaque random tokens; only a SHA-256 hash of the token is stored in `sessions`, with a 30-day expiry.
+- The session token is set as an `httpOnly`, `SameSite=Lax` cookie (`asw_session`) — never exposed to client-side JS, never stored in `localStorage`.
+- `POST /auth/signup` creates a `User`, an `Organization` (role `OWNER`), and a default `Project` in one transaction. `POST /auth/login`, `POST /auth/logout`, `GET /me`.
+- Every mission belongs to exactly one `organization_id` + `project_id`, set server-side from a membership check — the client can request a project but can never assign a mission to an org it isn't a member of.
+- All mission/approval routes require a valid session and verify org membership before returning data; a mission in an org you don't belong to returns `404` (not `403`), so its existence isn't leaked to non-members.
+- Roles are `OWNER > ADMIN > OPERATOR > MEMBER > VIEWER`. Creating a mission requires `MEMBER+`; deciding an approval requires `OPERATOR+`; creating a project requires `ADMIN+`.
+- `/auth/signup` and `/auth/login` are rate-limited (8/min) via `@fastify/rate-limit`; the rest of the API defaults to 300/min per IP.
+
+This covers the master build prompt's §34 auth requirements and the §55 Gate C / Gate K cross-org-isolation acceptance tests, verified with real signup/login/cross-org-access curl + browser tests (not just written, actually run). Not yet implemented: OAuth providers, password recovery, org invites (multi-member orgs), and CSRF tokens (currently relying on `SameSite=Lax` + credentialed CORS restricted to `WEB_ORIGIN`).
 
 ## Verification
 
@@ -131,4 +145,4 @@ See [`docs/API.md`](docs/API.md).
 
 ## Current production boundary
 
-This is a fully wired **mission/API/model/event/artifact MVP**, not the final enterprise control plane. Before exposing it publicly, add production authentication/tenancy, secret-vault integration, tool/MCP sandbox policies, rate limiting, and deployment hardening.
+This is a fully wired **mission/API/model/event/artifact MVP with real auth and org/project tenancy**, not the final enterprise control plane. Before exposing it publicly, still needed: OAuth/SSO, org invites, secret-vault integration (secrets currently come from server `.env` only), tool/MCP gateway, sandboxed task execution, richer verification gates (build/typecheck/security/a11y — today's gate only checks artifact existence), audit ledger, and deployment hardening (CSRF tokens, security headers, production TLS).

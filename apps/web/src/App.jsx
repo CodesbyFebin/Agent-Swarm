@@ -21,6 +21,8 @@ function Logo(){ return <span className="logoMark"><i/><i/><i/><i/></span>; }
 function Chip({children, color='#8a8a94'}){ return <span className="chip" style={{color,borderColor:`${color}55`,background:`${color}14`}}>{children}</span>; }
 
 export default function App(){
+  const [me,setMe]=useState(undefined); // undefined = checking session, null = signed out, object = signed in
+  const [projectId,setProjectId]=useState(null);
   const [health,setHealth]=useState(null);
   const [missions,setMissions]=useState([]);
   const [data,setData]=useState(null);
@@ -33,18 +35,22 @@ export default function App(){
   const [now,setNow]=useState(Date.now());
   const eventSourceRef=useRef(null);
 
+  useEffect(()=>{ api.me().then(setMe).catch(()=>setMe(null)); },[]);
+  useEffect(()=>{ if(me && me.projects?.length && !projectId) setProjectId(me.projects[0].id); },[me]);
+
   const refreshHealth=useCallback(async()=>{ try{ setHealth(await api.health()); }catch{ setHealth({status:'ERROR',database:'ERROR',qwen:'UNKNOWN'}); } },[]);
-  const refreshList=useCallback(async()=>{ try{ setMissions(await api.missions()); }catch{} },[]);
+  const refreshList=useCallback(async()=>{ if(!projectId)return; try{ setMissions(await api.missions(projectId)); }catch{} },[projectId]);
   const refreshMission=useCallback(async(id)=>{ if(!id)return; try{ setData(await api.mission(id)); setError(''); }catch(e){ setError(e.message); } },[]);
 
-  useEffect(()=>{ refreshHealth(); refreshList(); const i=setInterval(()=>setNow(Date.now()),1000); return()=>clearInterval(i); },[refreshHealth,refreshList]);
+  useEffect(()=>{ refreshHealth(); const i=setInterval(()=>setNow(Date.now()),1000); return()=>clearInterval(i); },[refreshHealth]);
+  useEffect(()=>{ if(me && projectId) refreshList(); },[me,projectId,refreshList]);
 
   useEffect(()=>{
     const id=data?.mission?.id;
     eventSourceRef.current?.close();
     if(!id)return;
     const last=data?.events?.at(-1)?.id || 0;
-    const es=new EventSource(api.streamUrl(id,last));
+    const es=new EventSource(api.streamUrl(id,last), { withCredentials: true });
     eventSourceRef.current=es;
     es.addEventListener('runtime',()=>{ refreshMission(id); refreshList(); refreshHealth(); });
     es.onerror=()=>{};
@@ -52,13 +58,17 @@ export default function App(){
   },[data?.mission?.id]);
 
   async function createMission(text){
-    const g=(text||goal).trim(); if(g.length<3)return;
+    const g=(text||goal).trim(); if(g.length<3||!projectId)return;
     setBusy(true); setError('');
-    try{ const created=await api.createMission({goal:g,mode}); setData(created); setGoal(''); setTab('overview'); refreshList(); }
+    try{ const created=await api.createMission({goal:g,mode,projectId}); setData(created); setGoal(''); setTab('overview'); refreshList(); }
     catch(e){ setError(e.message); } finally{ setBusy(false); }
   }
   async function action(fn){ if(!data?.mission?.id)return; setBusy(true); try{ setData(await fn(data.mission.id)); }catch(e){setError(e.message);}finally{setBusy(false);} }
   async function approval(fn,id){ setBusy(true); try{ setData(await fn(id)); }catch(e){setError(e.message);}finally{setBusy(false);} }
+  async function logout(){ try{ await api.logout(); }catch{} setMe(null); setData(null); setMissions([]); setProjectId(null); }
+
+  if(me===undefined) return <div className="app"><div className="entry"><p>Checking session…</p></div></div>;
+  if(me===null) return <AuthScreen onAuthed={setMe}/>;
 
   const mission=data?.mission;
   const pending=data?.approvals?.filter(a=>a.status==='PENDING') || [];
@@ -70,11 +80,19 @@ export default function App(){
   return <div className="app">
     <header className="topbar">
       <div className="brand"><Logo/><span>Agent<b>Swarm</b></span></div>
-      <div className="project">Project <b>AgentSwarm.in</b></div>
+      <div className="project">Project
+        {me.projects?.length>1
+          ? <select value={projectId||''} onChange={e=>{setProjectId(e.target.value);setData(null);}} className="projectSelect">
+              {me.projects.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}
+            </select>
+          : <b>{me.projects?.[0]?.name || 'AgentSwarm.in'}</b>}
+      </div>
       <div className="topSpacer"/>
       <Chip color={runtimeLive?'#4ade80':'#f87171'}>● API {health?.status||'CHECKING'}</Chip>
       <Chip color={health?.qwen==='CONFIGURED'?'#4ade80':'#fbbf24'}>QWEN {health?.qwen||'UNKNOWN'}</Chip>
       <button className={`approvalTop ${pending.length?'hot':''}`} onClick={()=>setInspector('approvals')}>Approvals {pending.length}</button>
+      <span className="userChip">{me.user.email}</span>
+      <button className="logoutBtn" onClick={logout}>Sign out</button>
     </header>
 
     <div className="shell">
@@ -107,11 +125,11 @@ export default function App(){
           </div>
           <div className="tabs">{['overview','tasks','activity','artifacts','verification'].map(t=><button key={t} className={tab===t?'on':''} onClick={()=>setTab(t)}>{t}</button>)}</div>
           <div className="tabBody">
-            {tab==='overview'&&<TaskGraph tasks={data.tasks}/>} 
-            {tab==='tasks'&&<TaskTable tasks={data.tasks}/>} 
-            {tab==='activity'&&<Trace events={data.events}/>} 
-            {tab==='artifacts'&&<Artifacts artifacts={data.artifacts}/>} 
-            {tab==='verification'&&<Verification rows={data.verification}/>} 
+            {tab==='overview'&&<TaskGraph tasks={data.tasks}/>}
+            {tab==='tasks'&&<TaskTable tasks={data.tasks}/>}
+            {tab==='activity'&&<Trace events={data.events}/>}
+            {tab==='artifacts'&&<Artifacts artifacts={data.artifacts}/>}
+            {tab==='verification'&&<Verification rows={data.verification}/>}
           </div>
         </>}
         {error&&<div className="errorBar">{error}</div>}
@@ -120,15 +138,54 @@ export default function App(){
       <aside className="inspector">
         <div className="insTabs">{['agents','trace','approvals','usage'].map(t=><button key={t} className={inspector===t?'on':''} onClick={()=>setInspector(t)}>{t}{t==='approvals'&&pending.length>0?<b>{pending.length}</b>:null}</button>)}</div>
         {!data?<div className="empty">Start or select a mission.</div>:<>
-          {inspector==='agents'&&<Agents tasks={data.tasks}/>} 
-          {inspector==='trace'&&<Trace events={data.events.slice(-80)}/>} 
-          {inspector==='approvals'&&<Approvals rows={data.approvals} onApprove={id=>approval(api.approve,id)} onReject={id=>approval(api.reject,id)} busy={busy}/>} 
-          {inspector==='usage'&&<Usage usage={data.usage}/>} 
+          {inspector==='agents'&&<Agents tasks={data.tasks}/>}
+          {inspector==='trace'&&<Trace events={data.events.slice(-80)}/>}
+          {inspector==='approvals'&&<Approvals rows={data.approvals} onApprove={id=>approval(api.approve,id)} onReject={id=>approval(api.reject,id)} busy={busy}/>}
+          {inspector==='usage'&&<Usage usage={data.usage}/>}
         </>}
       </aside>
     </div>
     <footer className="runtimeBar"><span className="statusDot" style={{background:runtimeLive?'#4ade80':'#f87171'}}/> LIVE DATA API · no simulated mission progress · SSE event stream · PostgreSQL durable state</footer>
   </div>
+}
+
+function AuthScreen({onAuthed}){
+  const [mode,setMode]=useState('login');
+  const [email,setEmail]=useState('');
+  const [password,setPassword]=useState('');
+  const [name,setName]=useState('');
+  const [orgName,setOrgName]=useState('');
+  const [busy,setBusy]=useState(false);
+  const [error,setError]=useState('');
+
+  async function submit(e){
+    e.preventDefault(); setBusy(true); setError('');
+    try{
+      const result = mode==='login'
+        ? await api.login({email,password})
+        : await api.signup({email,password,name:name||undefined,organizationName:orgName||undefined});
+      onAuthed(result);
+    }catch(err){ setError(err.message); } finally{ setBusy(false); }
+  }
+
+  return <div className="app"><div className="entry">
+    <div className="entryKicker">AGENTSWARM CONTROL PLANE</div>
+    <h1>{mode==='login'?'Sign in':'Create your workspace'}</h1>
+    <p>One goal. A governed swarm. Verified work.</p>
+    <form className="composer authForm" onSubmit={submit}>
+      <input value={email} onChange={e=>setEmail(e.target.value)} type="email" placeholder="Email" required autoComplete="username"/>
+      <input value={password} onChange={e=>setPassword(e.target.value)} type="password" placeholder="Password (min 8 characters)" required minLength={8} autoComplete={mode==='login'?'current-password':'new-password'}/>
+      {mode==='signup' && <>
+        <input value={name} onChange={e=>setName(e.target.value)} type="text" placeholder="Name (optional)"/>
+        <input value={orgName} onChange={e=>setOrgName(e.target.value)} type="text" placeholder="Organization name (optional)"/>
+      </>}
+      <div className="composerFoot"><button className="start" type="submit" disabled={busy}>{mode==='login'?'Sign in':'Create account'} →</button></div>
+    </form>
+    {error&&<div className="errorBar authErrorBar">{error}</div>}
+    <div className="quick">
+      <button type="button" onClick={()=>{setMode(mode==='login'?'signup':'login');setError('');}}>{mode==='login'?'Need an account? Sign up':'Already have an account? Sign in'}</button>
+    </div>
+  </div></div>;
 }
 
 function Entry({goal,setGoal,mode,setMode,busy,createMission,health}){

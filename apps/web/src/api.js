@@ -2,6 +2,7 @@ export const API = (import.meta.env.VITE_API_URL || 'http://localhost:8787').rep
 
 async function request(path, options = {}) {
   const res = await fetch(`${API}${path}`, {
+    credentials: 'include',
     headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
     ...options,
   });
@@ -12,7 +13,16 @@ async function request(path, options = {}) {
 
 export const api = {
   health: () => request('/health'),
-  missions: () => request('/api/missions'),
+  me: () => request('/me'),
+  signup: (payload) => request('/auth/signup', { method: 'POST', body: JSON.stringify(payload) }),
+  login: (payload) => request('/auth/login', { method: 'POST', body: JSON.stringify(payload) }),
+  logout: () => request('/auth/logout', { method: 'POST', body: '{}' }),
+
+  organizations: () => request('/api/organizations'),
+  projects: () => request('/api/projects'),
+  createProject: (payload) => request('/api/projects', { method: 'POST', body: JSON.stringify(payload) }),
+
+  missions: (projectId) => request(`/api/missions${projectId ? `?projectId=${encodeURIComponent(projectId)}` : ''}`),
   mission: (id) => request(`/api/missions/${id}`),
   createMission: (payload) => request('/api/missions', { method: 'POST', body: JSON.stringify(payload) }),
   pause: (id) => request(`/api/missions/${id}/pause`, { method: 'POST', body: '{}' }),
