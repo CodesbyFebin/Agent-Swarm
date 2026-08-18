@@ -3,6 +3,7 @@ dist/
 .next/
 next-env.d.ts
 .vercel/
+.claude/
 .env
 .env.local
 .DS_Store
