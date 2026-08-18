@@ -1,5 +1,5 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import type { AnyDomainEvent, EventStream, UUID } from "./domain-events";
+import { validateStream, type AnyDomainEvent, type EventStream, type UUID } from "./domain-events";
 
 export type EventStore = {
   append(events: EventStream): Promise<void>;
@@ -16,6 +16,8 @@ function client(): SupabaseClient {
 export function supabaseEventStore(db = client()): EventStore {
   return {
     async append(events) {
+      if (events.length === 0) return;
+      validateStream(events, events[0].correlation_id);
       const rows = events.map((event) => ({
         event_id: event.event_id,
         correlation_id: event.correlation_id,

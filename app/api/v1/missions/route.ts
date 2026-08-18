@@ -2,38 +2,28 @@ import { NextResponse } from "next/server";
 import { randomUUID } from "node:crypto";
 import { replayMission } from "@/src/mission-replay";
 import { supabaseEventStore } from "@/src/event-store";
-import type { ActorType, DomainEvent, UUID } from "@/src/domain-events";
+import { advanceMission, createMission } from "@/src/mission-service";
+import type { UUID } from "@/src/domain-events";
 
 export const runtime = "nodejs";
-
-function uuid(value: string): UUID { return value as UUID; }
-function now(): string { return new Date().toISOString(); }
+const asId = (value: string) => value as UUID;
+const requestId = () => randomUUID();
+function fail(code: string, message: string, status: number) { return NextResponse.json({ error: { code, message, requestId: requestId() } }, { status }); }
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json() as { name?: string; goal?: string };
-    if (!body.name?.trim() || !body.goal?.trim()) return NextResponse.json({ error: "name and goal are required" }, { status: 400 });
-    const missionId = uuid(randomUUID());
-    const event: DomainEvent<"mission.created"> = {
-      event_id: uuid(randomUUID()), event_type: "mission.created", occurred_at: now() as DomainEvent["occurred_at"],
-      actor_type: "user" satisfies ActorType, actor_id: uuid(randomUUID()), payload: { name: body.name.trim(), goal: body.goal.trim() },
-      causation_id: null, correlation_id: missionId, sequence_number: 1, schema_version: 1,
-    };
+    const body = await request.json() as { id?: string; name?: string; goal?: string; action?: "plan" | "start" | "verify" | "complete" };
     const store = supabaseEventStore();
-    await store.append([event]);
-    return NextResponse.json({ mission: replayMission([event]), events: [event] }, { status: 201 });
-  } catch (error) {
-    return NextResponse.json({ error: error instanceof Error ? error.message : "Unable to create mission" }, { status: 500 });
-  }
+    if (body.action && body.id) return NextResponse.json(await advanceMission(asId(body.id), body.action, store));
+    if (!body.name?.trim() || !body.goal?.trim()) return fail("INVALID_REQUEST", "name and goal are required", 400);
+    const result = await createMission({ name: body.name, goal: body.goal }, store);
+    return NextResponse.json({ ...result, requestId: requestId() }, { status: 201 });
+  } catch (error) { return fail("COMMAND_REJECTED", error instanceof Error ? error.message : "Unable to process mission command", 409); }
 }
 
 export async function GET(request: Request) {
-  const id = new URL(request.url).searchParams.get("id");
-  if (!id) return NextResponse.json({ error: "id is required" }, { status: 400 });
-  try {
-    const events = await supabaseEventStore().load(uuid(id));
-    return NextResponse.json({ mission: replayMission(events, uuid(id)), events });
-  } catch (error) {
-    return NextResponse.json({ error: error instanceof Error ? error.message : "Unable to load mission" }, { status: 500 });
-  }
+  const url = new URL(request.url); const id = url.searchParams.get("id");
+  if (!id) return fail("INVALID_REQUEST", "id is required", 400);
+  try { const events = await supabaseEventStore().load(asId(id)); return NextResponse.json({ mission: replayMission(events, asId(id)), events, requestId: requestId() }); }
+  catch (error) { return fail("READ_FAILED", error instanceof Error ? error.message : "Unable to load mission", 500); }
 }
