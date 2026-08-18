@@ -1,0 +1,9 @@
+/* TEAM */
+Maintainer: Febin Francis
+Site: https://agentswarm.in
+GitHub: https://github.com/CodesbyFebin
+
+/* SITE */
+Last update: 2026-08-18
+Stack: Next.js, React, Tailwind CSS
+Hosted with: Vercel

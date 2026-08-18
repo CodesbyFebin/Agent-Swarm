@@ -1,0 +1,40 @@
+# AgentSwarm.in
+
+> The control plane for AI workforces. One goal. A governed swarm. Verified work.
+
+AgentSwarm turns a natural-language goal into a dependency-aware task graph, executes it across
+specialist agents backed by a real model provider, blocks consequential actions on human approval,
+and records every state change as a persisted, replayable event. Postgres is the sole source of
+mission/task truth; Redis/BullMQ is a low-latency coordination layer on top of it, not a source of
+truth. The browser only ever renders backend state — there is no client-side timer or random-number
+mission engine.
+
+## Product
+
+- app.agentswarm.in — the Command Centre: mission composer, task DAG, agent inspector, approval
+  center, real-time event trace, cost/usage view.
+- Repository: https://github.com/CodesbyFebin/Agent-Swarm
+
+## What is actually live today
+
+- Backend-authoritative mission lifecycle: DRAFT/QUEUED/PLANNING/RUNNING/WAITING_APPROVAL/PAUSED/
+  VERIFYING/COMPLETED/FAILED/CANCELLED/BLOCKED, enforced server-side.
+- Dynamic planner that decomposes a goal into 3-12 dependency-aware tasks via a real model call,
+  validated for cycles and unknown dependencies before persisting.
+- Eight specialist agents: planner, researcher, architect, backend, frontend, QA, security, devops.
+- Durable task leasing (Postgres FOR UPDATE SKIP LOCKED), retry with backoff, dead-lettering, and
+  lease-expiry recovery — safe under concurrent workers and worker restarts.
+- Real authentication (bcrypt-hashed passwords, DB-backed sessions) and org/project/role tenancy
+  (OWNER/ADMIN/OPERATOR/MEMBER/VIEWER). Cross-organization access returns a genuine 404.
+- Approval gates that genuinely block task execution until a human with sufficient role decides.
+- Server-Sent Events with durable backlog replay from a persisted, sequenced event ledger.
+- A verification gate that checks real artifact existence before a mission is marked COMPLETED.
+
+## What is not yet live (do not assume these are implemented)
+
+MCP tool registry, sandboxed task workspaces, persistent memory and skills, a scheduler, a
+provider-cost-backed billing engine, and richer verification gates (build/typecheck/security scan).
+
+## Full detail
+
+See /llms-full.txt for an uncompressed page-content dump.

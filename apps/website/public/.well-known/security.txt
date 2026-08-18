@@ -1,0 +1,3 @@
+Contact: https://github.com/CodesbyFebin/Agent-Swarm/security/advisories/new
+Preferred-Languages: en
+Canonical: https://agentswarm.in/.well-known/security.txt

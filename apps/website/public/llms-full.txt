@@ -1,0 +1,102 @@
+# AgentSwarm.in — full reference
+
+One goal. A governed swarm. Verified work.
+
+## Positioning
+
+AgentSwarm is a control plane for AI workforces. Tell it what needs to get done; it plans the work,
+assembles the right specialist agents, executes, blocks on human approval where consequential, and
+gives the operator a real, replayable trail of evidence — not a model's self-report of success.
+
+## Architecture
+
+```
+React Command Centre
+        v HTTP / SSE
+Fastify Mission API
+        v
+PostgreSQL durable state + event store   <-- sole source of truth
+        v
+Worker (Postgres FOR UPDATE SKIP LOCKED authoritative claim)
+        ^ low-latency wake-up signal only
+Redis / BullMQ (coordination, never truth)
+        v
+Model provider (OpenAI-compatible; shipped with Qwen)
+        v
+Task outputs -> Artifacts -> Verification -> Mission completion
+```
+
+The backend is authoritative. The browser is a projection of persisted state, never the source of
+mission truth. If a required model provider is not configured, a mission is honestly marked BLOCKED
+with provider status UNAVAILABLE — never simulated as running or completed.
+
+## Mission lifecycle
+
+QUEUED -> PLANNING -> RUNNING -> WAITING_APPROVAL (when required) -> RUNNING -> VERIFYING -> COMPLETED
+Terminal/control states also include PAUSED, FAILED, CANCELLED, BLOCKED.
+Every transition is server-side validated and produces a persisted event.
+
+## Task lifecycle
+
+QUEUED -> READY -> LEASED -> RUNNING -> SUCCEEDED
+Also: WAITING_APPROVAL, RETRY_WAIT, FAILED, CANCELLED, DEAD_LETTER.
+Leases are persisted in PostgreSQL; expired leases are recovered by the worker. Retries are bounded
+and use exponential backoff before dead-lettering.
+
+## Auth & tenancy
+
+Passwords are hashed with bcrypt. Sessions are opaque random tokens; only a SHA-256 hash of the
+token is stored server-side, delivered as an httpOnly, SameSite=Lax cookie — never exposed to
+client-side JS or stored in localStorage. Every mission belongs to exactly one organization and
+project, assigned server-side from a verified membership check the client cannot bypass. Roles are
+OWNER > ADMIN > OPERATOR > MEMBER > VIEWER: creating a mission requires MEMBER+, deciding an
+approval requires OPERATOR+, creating a project requires ADMIN+. A mission outside the caller's
+organizations returns 404, not 403 — existence isn't leaked to non-members.
+
+## Approvals
+
+A task can declare requiresApproval and a risk level (LOW/MEDIUM/HIGH/CRITICAL). When the worker
+reaches such a task, it creates a persisted approval request and the task genuinely stops in
+WAITING_APPROVAL. Approving resumes the exact task; rejecting fails the mission. No optimistic
+client-side approval — the API is authoritative for the decision.
+
+## Realtime
+
+Every runtime event is inserted into a durable events table with a monotonically increasing
+sequence number. A PostgreSQL trigger issues NOTIFY; the API's SSE endpoint listens and streams
+matching events to connected clients. Reconnecting clients pass the last event ID and receive
+missed events from the durable event store — no duplicate or lost state on reconnect.
+
+## Durable dispatch
+
+Postgres row-level locking (FOR UPDATE SKIP LOCKED) is the sole authority on which worker claims a
+given mission or task — this holds regardless of how many workers run concurrently. Redis/BullMQ
+adds a low-latency wake-up signal on top: after a transaction commits, a lightweight job is
+enqueued; the worker's BullMQ consumer reacts by re-running the same claim logic (the job payload
+is a hint, never an instruction, so a dropped or duplicate job can't cause duplicate execution). A
+slow fallback poll runs independently of Redis and is the only dispatch path when Redis is
+unavailable or unconfigured — same correctness, higher latency. This was verified against a real
+Redis outage (mission still reached its correct terminal state via the fallback poll alone, and the
+API request itself returned in ~1.6s instead of hanging) and a killed-and-restarted worker process
+(resumed cleanly with no duplicate events).
+
+## Verification
+
+When every task in a mission succeeds, the mission enters VERIFYING. The current gate checks that
+every succeeded task has a persisted artifact before the mission is marked COMPLETED — deliberately
+minimal and truthful rather than a decorative green check. Build/typecheck/security verification
+gates are on the roadmap as real tool adapters, not yet implemented.
+
+## What is not yet live
+
+MCP tool registry and gateway, sandboxed/isolated task workspaces, persistent memory and reusable
+skills, a scheduler for recurring or webhook-triggered missions, a cost engine backed by real
+provider-reported usage (current token counts are stored only when the provider returns them —
+never fabricated; cost is UNKNOWN rather than guessed), and richer verification gates beyond
+artifact-existence.
+
+## Links
+
+- Repository: https://github.com/CodesbyFebin/Agent-Swarm
+- Application: https://app.agentswarm.in
+- Website: https://agentswarm.in
