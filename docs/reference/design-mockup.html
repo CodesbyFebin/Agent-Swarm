@@ -1,0 +1,2333 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="AgentSwarm — The control plane for AI workforces. Plan missions, deploy specialist agents, observe execution, approve actions, verify results.">
+<meta name="theme-color" content="#FF5A1F">
+<title>AgentSwarm — AI Workforce Control Plane</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-400-normal.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-500-normal.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-600-normal.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-700-normal.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-800-normal.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/fontsource/fonts/jetbrains-mono@latest/latin-400-normal.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/fontsource/fonts/jetbrains-mono@latest/latin-500-normal.css" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#06060a;--bg-elev:#0c0c14;--bg-elev2:#13131d;--bg-elev3:#1a1a26;
+  --border:#24243a;--border-subtle:#18182a;
+  --text:#ececf4;--text-dim:#8888a4;--text-muted:#545470;
+  --orange:#FF5A1F;--orange-dim:#d14a18;--orange-glow:rgba(255,90,31,0.12);
+  --green:#22c55e;--green-dim:rgba(34,197,94,0.12);
+  --blue:#3b82f6;--blue-dim:rgba(59,130,246,0.12);
+  --amber:#f59e0b;--amber-dim:rgba(245,158,11,0.12);
+  --purple:#a855f7;--purple-dim:rgba(168,85,247,0.12);
+  --red:#ef4444;--red-dim:rgba(239,68,68,0.12);
+  --teal:#14b8a6;--teal-dim:rgba(20,184,166,0.12);
+  --radius:6px;--radius-lg:10px;--radius-xl:14px;
+  --font-ui:'Inter',system-ui,-apple-system,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,monospace;
+  --t:140ms cubic-bezier(.4,0,.2,1);
+}
+html{font-size:14px;-webkit-font-smoothing:antialiased}
+body{font-family:var(--font-ui);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;line-height:1.5}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,textarea,select{font-family:inherit;color:inherit}
+.mono{font-family:var(--font-mono)}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* ─── State Labels ─── */
+.sl{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;font-family:var(--font-mono);letter-spacing:0.04em}
+.sl-live{background:var(--green-dim);color:var(--green)}
+.sl-live::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+.sl-sim{background:var(--purple-dim);color:var(--purple)}
+.sl-fix{background:var(--amber-dim);color:var(--amber)}
+.sl-unavail{background:var(--red-dim);color:var(--red)}
+.sl-unknown{background:var(--border);color:var(--text-dim)}
+.sl-degraded{background:var(--amber-dim);color:var(--amber)}
+.sl-configured{background:var(--blue-dim);color:var(--blue)}
+.sl-exec{background:var(--blue-dim);color:var(--blue)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+
+.demo-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;background:var(--orange-glow);color:var(--orange);border:1px solid rgba(255,90,31,0.25)}
+.demo-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--orange);animation:pulse 2s infinite}
+
+/* ─── Public Nav ─── */
+.pub-nav{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:14px 24px;background:rgba(6,6,10,0.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border-subtle)}
+.pub-nav-left{display:flex;align-items:center;gap:28px}
+.pub-logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:16px;letter-spacing:-0.02em}
+.pub-logo-icon{width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,var(--orange),#ff8c42);display:flex;align-items:center;justify-content:center}
+.pub-logo-icon svg{width:16px;height:16px;color:#fff}
+.pub-logo em{font-style:normal;color:var(--orange)}
+.pub-links{display:flex;gap:22px;font-size:13px;color:var(--text-dim)}
+.pub-links a:hover{color:var(--text)}
+.pub-nav-right{display:flex;align-items:center;gap:12px}
+
+.btn{padding:8px 16px;border-radius:var(--radius);font-size:13px;font-weight:600;transition:var(--t);display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn-primary{background:var(--orange);color:#fff}
+.btn-primary:hover{background:var(--orange-dim);transform:translateY(-1px)}
+.btn-ghost{background:transparent;color:var(--text-dim);border:1px solid var(--border)}
+.btn-ghost:hover{background:var(--bg-elev2);color:var(--text);border-color:var(--border)}
+.btn-danger{background:var(--red-dim);color:var(--red);border:1px solid rgba(239,68,68,0.3)}
+.btn-danger:hover{background:rgba(239,68,68,0.2)}
+.btn-sm{padding:6px 12px;font-size:11px}
+.btn-lg{padding:12px 22px;font-size:14px}
+.btn:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+
+/* ─── Public Hero ─── */
+.pub-hero{padding:80px 24px 60px;text-align:center;background:radial-gradient(ellipse at top,rgba(255,90,31,0.08) 0%,transparent 60%);border-bottom:1px solid var(--border-subtle)}
+.pub-hero h1{font-size:clamp(32px,5vw,56px);font-weight:800;letter-spacing:-0.03em;line-height:1.1;max-width:900px;margin:0 auto 20px}
+.pub-hero h1 em{font-style:normal;color:var(--orange)}
+.pub-hero p{font-size:clamp(15px,1.6vw,18px);color:var(--text-dim);max-width:640px;margin:0 auto 32px;line-height:1.6}
+.pub-hero-ctas{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.pub-trust{display:flex;gap:24px;justify-content:center;flex-wrap:wrap;margin-top:40px;font-size:12px;color:var(--text-muted);font-weight:500}
+.pub-trust span{display:flex;align-items:center;gap:6px}
+.pub-trust svg{width:14px;height:14px;color:var(--orange)}
+
+.pub-section{padding:70px 24px;border-bottom:1px solid var(--border-subtle)}
+.pub-section-inner{max-width:1200px;margin:0 auto}
+.pub-section h2{font-size:clamp(24px,3vw,36px);font-weight:800;letter-spacing:-0.02em;margin-bottom:12px}
+.pub-section h2 em{font-style:normal;color:var(--orange)}
+.pub-section .subtitle{font-size:15px;color:var(--text-dim);max-width:600px;margin-bottom:40px}
+
+.feature-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.feature-card{background:var(--bg-elev);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:24px;transition:var(--t)}
+.feature-card:hover{border-color:var(--border);transform:translateY(-2px)}
+.feature-card-icon{width:40px;height:40px;border-radius:var(--radius);background:var(--orange-glow);color:var(--orange);display:flex;align-items:center;justify-content:center;margin-bottom:16px}
+.feature-card-icon svg{width:20px;height:20px}
+.feature-card h3{font-size:15px;font-weight:700;margin-bottom:8px}
+.feature-card p{font-size:13px;color:var(--text-dim);line-height:1.6}
+
+.lifecycle-flow{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;padding:20px 0}
+.lifecycle-step{background:var(--bg-elev);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:12px 16px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px}
+.lifecycle-step .num{width:22px;height:22px;border-radius:50%;background:var(--orange);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+
+.use-case-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
+.use-case-chip{background:var(--bg-elev);border:1px solid var(--border-subtle);border-radius:var(--radius);padding:12px 14px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px;transition:var(--t)}
+.use-case-chip:hover{border-color:var(--orange);color:var(--orange)}
+.use-case-chip svg{width:14px;height:14px;color:var(--orange)}
+
+.pillar-preview{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.pillar-card{background:var(--bg-elev);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:18px;transition:var(--t);cursor:pointer}
+.pillar-card:hover{border-color:var(--border);transform:translateY(-2px)}
+.pillar-card .cluster{font-size:10px;font-weight:700;color:var(--orange);font-family:var(--font-mono);letter-spacing:0.05em;margin-bottom:6px}
+.pillar-card h4{font-size:14px;font-weight:700;margin-bottom:6px;line-height:1.3}
+.pillar-card p{font-size:12px;color:var(--text-dim);line-height:1.5}
+
+.pub-footer{padding:50px 24px 30px;border-top:1px solid var(--border-subtle);background:var(--bg-elev)}
+.pub-footer-inner{max-width:1200px;margin:0 auto}
+.pub-footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:40px}
+@media(max-width:700px){.pub-footer-grid{grid-template-columns:1fr 1fr;gap:30px}}
+.pub-footer h5{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:14px}
+.pub-footer ul{list-style:none;display:flex;flex-direction:column;gap:10px}
+.pub-footer a{font-size:13px;color:var(--text-dim);transition:var(--t)}
+.pub-footer a:hover{color:var(--text)}
+.pub-footer-bottom{padding-top:24px;border-top:1px solid var(--border-subtle);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--text-muted)}
+
+/* ─── App Topbar ─── */
+.app-topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 18px;border-bottom:1px solid var(--border-subtle);background:var(--bg-elev);position:sticky;top:0;z-index:100}
+.app-topbar-left{display:flex;align-items:center;gap:12px}
+.app-topbar-logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:15px;letter-spacing:-0.02em}
+.app-topbar-logo em{font-style:normal;color:var(--orange)}
+.app-topbar-center{display:flex;align-items:center;gap:10px}
+.kbd-hint{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);padding:2px 6px;border:1px solid var(--border);border-radius:4px}
+.app-topbar-right{display:flex;align-items:center;gap:10px}
+.topbar-btn{width:34px;height:34px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;border:1px solid var(--border);color:var(--text-dim);transition:var(--t);position:relative}
+.topbar-btn:hover{background:var(--bg-elev2);color:var(--text)}
+.topbar-btn .badge{position:absolute;top:-4px;right:-4px;min-width:16px;height:16px;border-radius:8px;padding:0 4px;background:var(--orange);color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.api-status{display:flex;align-items:center;gap:6px;font-size:10px;font-family:var(--font-mono);font-weight:500;padding:4px 8px;background:var(--bg-elev2);border-radius:4px;border:1px solid var(--border-subtle)}
+.api-status .dot{width:6px;height:6px;border-radius:50%}
+.api-status.connected .dot{background:var(--green)}
+.api-status.disconnected .dot{background:var(--red)}
+
+/* ─── App Layout ─── */
+.app-layout{display:grid;grid-template-columns:220px 1fr 300px;min-height:calc(100vh - 49px)}
+@media(max-width:1280px){.app-layout{grid-template-columns:200px 1fr 280px}}
+@media(max-width:1024px){.app-layout{grid-template-columns:1fr}}
+
+.sidebar{border-right:1px solid var(--border-subtle);background:var(--bg-elev);padding:12px 0;overflow-y:auto}
+.sidebar-section{margin-bottom:10px}
+.sidebar-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);padding:8px 16px 4px}
+.sidebar-item{display:flex;align-items:center;gap:10px;padding:8px 16px;font-size:13px;color:var(--text-dim);cursor:pointer;transition:var(--t);border-left:2px solid transparent}
+.sidebar-item:hover{background:var(--bg-elev2);color:var(--text)}
+.sidebar-item.active{background:var(--orange-glow);color:var(--orange);border-left-color:var(--orange)}
+.sidebar-item svg{width:16px;height:16px;flex-shrink:0}
+.sidebar-item .count{margin-left:auto;font-size:10px;font-family:var(--font-mono);background:var(--bg-elev3);padding:1px 6px;border-radius:10px;font-weight:600}
+.sidebar-user{display:flex;align-items:center;gap:10px;padding:12px 16px;border-top:1px solid var(--border-subtle);margin-top:8px}
+.sidebar-user-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--orange),#ff8c42);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#fff}
+.sidebar-user-info{font-size:12px}
+.sidebar-user-info small{color:var(--text-muted);font-size:10px;display:block}
+
+.main-content{overflow-y:auto;padding:22px}
+.main-header{margin-bottom:22px}
+.mission-title-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.mission-title{font-size:22px;font-weight:800;letter-spacing:-0.02em}
+.mission-status{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;font-family:var(--font-mono);letter-spacing:0.02em}
+.status-running{background:var(--blue-dim);color:var(--blue)}
+.status-running::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--blue);animation:pulse 1.5s infinite}
+.status-completed{background:var(--green-dim);color:var(--green)}
+.status-completed::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green)}
+.status-waiting{background:var(--amber-dim);color:var(--amber)}
+.status-waiting::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--amber)}
+.status-planning{background:var(--purple-dim);color:var(--purple)}
+.status-planning::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--purple);animation:pulse 1.5s infinite}
+.status-verifying{background:var(--teal-dim);color:var(--teal)}
+.status-verifying::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--teal);animation:pulse 1.5s infinite}
+.status-paused{background:var(--amber-dim);color:var(--amber)}
+.status-cancelled{background:var(--red-dim);color:var(--red)}
+.status-failed{background:var(--red-dim);color:var(--red)}
+.mission-meta{display:flex;align-items:center;gap:16px;margin-top:10px;font-size:12px;color:var(--text-dim);flex-wrap:wrap}
+.mission-meta .mono{color:var(--text-muted);font-family:var(--font-mono);font-size:11px}
+
+.truth-banner{
+  display:flex;align-items:center;gap:10px;padding:10px 14px;
+  background:var(--bg-elev2);border:1px solid var(--border-subtle);
+  border-radius:var(--radius-lg);margin-bottom:16px;font-size:12px;
+}
+.truth-banner .truth-icon{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.truth-banner .truth-icon.sim{background:var(--purple-dim);color:var(--purple)}
+.truth-banner .truth-icon.live{background:var(--green-dim);color:var(--green)}
+
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
+@media(max-width:700px){.kpi-row{grid-template-columns:repeat(2,1fr)}}
+.kpi-card{background:var(--bg-elev);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:14px}
+.kpi-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:6px}
+.kpi-value{font-size:22px;font-weight:800;font-family:var(--font-mono);letter-spacing:-0.02em}
+.kpi-sub{font-size:11px;color:var(--text-dim);margin-top:3px}
+.kpi-sub.positive{color:var(--green)}
+.kpi-sub.unknown{color:var(--text-muted)}
+
+.section{margin-bottom:22px}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.section-title{font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px}
+.section-title svg{width:16px;height:16px;color:var(--orange)}
+.section-action{font-size:12px;color:var(--orange);cursor:pointer;font-weight:600}
+.section-action:hover{text-decoration:underline}
+
+.dag-container{background:var(--bg-elev);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:18px;overflow-x:auto}
+.dag-svg{width:100%;min-width:600px;height:260px}
+.dag-node{cursor:pointer;transition:var(--t)}
+.dag-node:hover .dag-node-rect{stroke:var(--orange)!important;stroke-width:2}
+.dag-node-rect{rx:8;fill:var(--bg-elev2);stroke:var(--border);stroke-width:1.5;transition:var(--t)}
+.dag-node-rect.running{stroke:var(--blue);stroke-width:2;filter:drop-shadow(0 0 6px rgba(59,130,246,0.3))}
+.dag-node-rect.completed{stroke:var(--green);stroke-width:2}
+.dag-node-rect.waiting{stroke:var(--amber);stroke-width:2}
+.dag-node-rect.blocked{stroke:var(--red);stroke-width:2}
+.dag-node-rect.pending{stroke:var(--border);stroke-width:1.5}
+.dag-node-label{font-size:11px;font-weight:600;fill:var(--text)}
+.dag-node-sub{font-size:9px;fill:var(--text-dim)}
+.dag-edge{stroke:var(--border);stroke-width:1.5;fill:none}
+.dag-edge.active{stroke:var(--blue);stroke-width:2;stroke-dasharray:4 2;animation:dash-flow 1s linear infinite}
+.dag-edge.done{stroke:var(--green);stroke-width:2}
+@keyframes dash-flow{to{stroke-dashoffset:-6}}
+
+.agent-list{display:flex;flex-direction:column;gap:8px}
+.agent-card{display:flex;align-items:center;gap:12px;background:var(--bg-elev);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:12px 14px;cursor:pointer;transition:var(--t)}
+.agent-card:hover{border-color:var(--border);background:var(--bg-elev2)}
+.agent-card.selected{border-color:var(--orange);background:var(--orange-glow)}
+.agent-icon{width:36px;height:36px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.agent-icon svg{width:18px;height:18px}
+.agent-info{flex:1;min-width:0}
+.agent-name{font-size:13px;font-weight:700}
+.agent-role{font-size:11px;color:var(--text-dim)}
+.agent-status{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;font-family:var(--font-mono)}
+.agent-status .dot{width:6px;height:6px;border-radius:50%}
+.agent-progress{width:80px;text-align:right}
+.agent-progress-bar{height:4px;background:var(--bg-elev3);border-radius:2px;overflow:hidden;margin-top:4px}
+.agent-progress-fill{height:100%;border-radius:2px;transition:width 0.5s ease}
+.agent-pct{font-size:11px;font-weight:700;font-family:var(--font-mono);margin-top:2px}
+
+.inspector{border-left:1px solid var(--border-subtle);background:var(--bg-elev);overflow-y:auto;padding:16px}
+.inspector-header{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:14px}
+.inspector-section{margin-bottom:16px}
+.inspector-section-title{font-size:10px;font-weight:700;color:var(--text-dim);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.06em}
+.inspector-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:12px}
+.inspector-row .label{color:var(--text-dim)}
+.inspector-row .value{font-family:var(--font-mono);font-size:11px;text-align:right;max-width:60%;word-break:break-all}
+.inspector-note{font-size:10px;color:var(--text-muted);padding:8px 10px;background:var(--bg-elev2);border-radius:var(--radius);border-left:2px solid var(--orange);margin-top:8px;line-height:1.5}
+
+.approval-card{background:var(--bg-elev);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:14px;margin-bottom:10px}
+.approval-risk{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;margin-bottom:8px;font-family:var(--font-mono);letter-spacing:0.05em}
+.risk-high{background:var(--red-dim);color:var(--red)}
+.risk-medium{background:var(--amber-dim);color:var(--amber)}
+.risk-low{background:var(--green-dim);color:var(--green)}
+.approval-title{font-size:13px;font-weight:700;margin-bottom:6px}
+.approval-detail{font-size:11px;color:var(--text-dim);margin-bottom:4px}
+.approval-detail .mono{font-family:var(--font-mono);font-size:10px}
+.approval-actions{display:flex;gap:8px;margin-top:10px}
+
+.trace-container{background:var(--bg-elev);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);overflow:hidden}
+.trace-filters{display:flex;gap:4px;padding:10px 12px;border-bottom:1px solid var(--border-subtle);flex-wrap:wrap}
+.trace-filter{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;background:var(--bg-elev2);color:var(--text-dim);cursor:pointer;transition:var(--t)}
+.trace-filter:hover{color:var(--text)}
+.trace-filter.active{background:var(--orange-glow);color:var(--orange)}
+.trace-list{max-height:320px;overflow-y:auto}
+.trace-item{display:flex;align-items:flex-start;gap:10px;padding:8px 12px;border-bottom:1px solid var(--border-subtle);font-size:12px;transition:var(--t)}
+.trace-item:hover{background:var(--bg-elev2)}
+.trace-time{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);width:62px;flex-shrink:0;padding-top:2px}
+.trace-seq{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);width:32px;flex-shrink:0;text-align:right}
+.trace-actor{font-weight:600;width:120px;flex-shrink:0;font-size:12px}
+.trace-event{color:var(--text-dim);flex:1}
+.trace-event .mono{font-family:var(--font-mono);font-size:11px}
+.trace-tag{font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;font-family:var(--font-mono);flex-shrink:0}
+
+.evidence-card,.artifact-card,.skill-card,.memory-item{background:var(--bg-elev);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:14px;margin-bottom:10px;cursor:pointer;transition:var(--t)}
+.evidence-card:hover,.artifact-card:hover,.skill-card:hover{border-color:var(--border);transform:translateY(-1px)}
+.evidence-source{font-size:10px;font-weight:700;color:var(--orange);font-family:var(--font-mono);margin-bottom:4px}
+.evidence-claim{font-size:12px;line-height:1.5;margin-bottom:8px}
+.evidence-meta{display:flex;gap:12px;font-size:10px;color:var(--text-dim);flex-wrap:wrap}
+.confidence-high{color:var(--green)}
+.confidence-low{color:var(--red)}
+
+.artifact-grid,.skill-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.artifact-card{margin-bottom:0}
+.artifact-icon,.skill-icon{width:32px;height:32px;border-radius:var(--radius);background:var(--bg-elev2);display:flex;align-items:center;justify-content:center;margin-bottom:10px}
+.artifact-icon svg,.skill-icon svg{width:16px;height:16px;color:var(--orange)}
+.artifact-name,.skill-name{font-size:12px;font-weight:700;margin-bottom:3px}
+.artifact-meta,.skill-desc{font-size:10px;color:var(--text-dim);line-height:1.4}
+
+.memory-item{display:flex;align-items:flex-start;gap:10px}
+.memory-item .mem-cat{font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;background:var(--orange-glow);color:var(--orange);font-family:var(--font-mono);flex-shrink:0;margin-top:2px}
+.memory-item .mem-text{flex:1;font-size:12px;line-height:1.5}
+
+.cost-breakdown{background:var(--bg-elev);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:16px}
+.cost-total{font-size:28px;font-weight:800;font-family:var(--font-mono);letter-spacing:-0.02em;margin-bottom:4px}
+.cost-total-label{font-size:11px;color:var(--text-dim);margin-bottom:12px}
+.cost-bar{height:6px;background:var(--bg-elev3);border-radius:3px;overflow:hidden;margin-bottom:12px}
+.cost-bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--orange),var(--purple))}
+.cost-items{display:flex;flex-direction:column;gap:6px}
+.cost-item{display:flex;align-items:center;justify-content:space-between;font-size:12px}
+.cost-item-name{display:flex;align-items:center;gap:8px}
+.cost-item-dot{width:8px;height:8px;border-radius:50%}
+.cost-item-value{font-family:var(--font-mono);font-size:11px}
+
+.verification-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}
+.v-gate{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg-elev);border:1px solid var(--border-subtle);border-radius:var(--radius);font-size:12px}
+.v-gate-icon{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.v-gate-icon.pass{background:var(--green-dim);color:var(--green)}
+.v-gate-icon.fail{background:var(--red-dim);color:var(--red)}
+.v-gate-icon.pending{background:var(--bg-elev3);color:var(--text-muted)}
+.v-gate-icon.unknown{background:var(--border);color:var(--text-dim)}
+.v-gate-name{font-weight:600;flex:1}
+.v-gate-status{font-family:var(--font-mono);font-size:10px;font-weight:700}
+
+.progress-bar{height:8px;background:var(--bg-elev3);border-radius:4px;overflow:hidden}
+.progress-fill{height:100%;border-radius:4px;transition:width 0.6s ease;background:linear-gradient(90deg,var(--orange),var(--purple))}
+
+.composer-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);display:flex;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(10px);padding:20px}
+.composer{background:var(--bg-elev);border:1px solid var(--border);border-radius:var(--radius-xl);padding:26px;width:100%;max-width:620px;max-height:85vh;overflow-y:auto;box-shadow:0 12px 32px rgba(0,0,0,0.5)}
+.composer h2{font-size:24px;font-weight:800;margin-bottom:6px;letter-spacing:-0.02em}
+.composer h2 em{font-style:normal;color:var(--orange)}
+.composer-sub{font-size:13px;color:var(--text-dim);margin-bottom:20px;line-height:1.5}
+.composer-input{width:100%;padding:14px;background:var(--bg-elev2);border:1px solid var(--border);border-radius:var(--radius-lg);font-size:14px;color:var(--text);resize:none;min-height:90px;outline:none;transition:var(--t);line-height:1.5}
+.composer-input:focus{border-color:var(--orange);box-shadow:0 0 0 3px var(--orange-glow)}
+.composer-input::placeholder{color:var(--text-muted)}
+.composer-modes{display:flex;gap:6px;margin:16px 0;flex-wrap:wrap}
+.composer-mode{padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700;background:var(--bg-elev2);border:1px solid var(--border);color:var(--text-dim);cursor:pointer;transition:var(--t);font-family:var(--font-mono);letter-spacing:0.03em}
+.composer-mode:hover{color:var(--text);border-color:var(--border)}
+.composer-mode.active{background:var(--orange);color:#fff;border-color:var(--orange)}
+.composer-quick{display:flex;flex-wrap:wrap;gap:6px;margin:16px 0}
+.composer-quick-item{padding:6px 12px;border-radius:20px;font-size:11px;background:var(--bg-elev2);border:1px solid var(--border-subtle);color:var(--text-dim);cursor:pointer;transition:var(--t)}
+.composer-quick-item:hover{border-color:var(--orange);color:var(--orange)}
+.composer-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+
+.cmd-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.65);display:flex;align-items:flex-start;justify-content:center;padding-top:18vh;z-index:300;backdrop-filter:blur(4px)}
+.cmd-palette{background:var(--bg-elev);border:1px solid var(--border);border-radius:var(--radius-lg);width:95%;max-width:540px;overflow:hidden;box-shadow:0 12px 32px rgba(0,0,0,0.5)}
+.cmd-input{width:100%;padding:14px 16px;background:transparent;border:none;border-bottom:1px solid var(--border-subtle);font-size:14px;color:var(--text);outline:none}
+.cmd-input::placeholder{color:var(--text-muted)}
+.cmd-list{max-height:340px;overflow-y:auto;padding:8px}
+.cmd-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius);cursor:pointer;transition:var(--t);font-size:13px}
+.cmd-item:hover,.cmd-item.focused{background:var(--bg-elev2)}
+.cmd-item svg{width:16px;height:16px;color:var(--text-dim);flex-shrink:0}
+.cmd-item .cmd-shortcut{margin-left:auto;font-family:var(--font-mono);font-size:10px;color:var(--text-muted)}
+
+.bottom-sheet-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:250;display:none}
+.bottom-sheet{position:fixed;bottom:0;left:0;right:0;background:var(--bg-elev);border-top:1px solid var(--border);border-radius:16px 16px 0 0;padding:16px;max-height:70vh;overflow-y:auto;z-index:251;transform:translateY(100%);transition:transform 0.3s cubic-bezier(.4,0,.2,1)}
+.bottom-sheet.open{transform:translateY(0)}
+.bottom-sheet-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 12px}
+
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--bg-elev);border-top:1px solid var(--border);padding:6px 0 calc(6px + env(safe-area-inset-bottom));z-index:100}
+.mobile-nav-inner{display:flex;justify-content:space-around}
+.mobile-nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 10px;font-size:10px;color:var(--text-dim);cursor:pointer;transition:var(--t);font-weight:600}
+.mobile-nav-item.active{color:var(--orange)}
+.mobile-nav-item svg{width:20px;height:20px}
+.mobile-nav-item.center-btn{position:relative;top:-14px}
+.mobile-nav-item.center-btn .center-icon{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,var(--orange),#ff8c42);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(255,90,31,0.4)}
+.mobile-nav-item.center-btn .center-icon svg{width:22px;height:22px;color:#fff}
+
+@media(max-width:1024px){
+  .sidebar,.inspector{display:none}
+  .app-layout{grid-template-columns:1fr}
+  .mobile-nav{display:block}
+  .main-content{padding-bottom:80px}
+}
+
+.notification{position:fixed;top:60px;right:20px;z-index:400;background:var(--bg-elev);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px 16px;font-size:12px;box-shadow:0 12px 32px rgba(0,0,0,0.5);transform:translateX(120%);transition:transform 0.3s cubic-bezier(.4,0,.2,1);max-width:320px;font-weight:500}
+.notification.show{transform:translateX(0)}
+.notification.success{border-left:3px solid var(--green)}
+.notification.error{border-left:3px solid var(--red)}
+.notification.info{border-left:3px solid var(--blue)}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn 0.3s ease}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important}}
+:focus-visible{outline:2px solid var(--orange);outline-offset:2px;border-radius:2px}
+.empty-state{text-align:center;padding:40px 20px;color:var(--text-dim)}
+.empty-state svg{width:48px;height:48px;color:var(--text-muted);margin-bottom:12px}
+.empty-state h3{font-size:14px;font-weight:700;margin-bottom:4px;color:var(--text)}
+.empty-state p{font-size:12px}
+.tab-bar{display:flex;gap:4px;margin-bottom:16px;border-bottom:1px solid var(--border-subtle)}
+.tab{padding:8px 14px;font-size:12px;font-weight:600;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;transition:var(--t)}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--orange);border-bottom-color:var(--orange)}
+
+/* Capability registry */
+.cap-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
+.cap-card{background:var(--bg-elev);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:14px}
+.cap-name{font-size:13px;font-weight:700;margin-bottom:4px}
+.cap-status{font-size:11px;margin-bottom:6px}
+.cap-meta{font-size:10px;color:var(--text-muted);font-family:var(--font-mono)}
+
+/* Policy rules */
+.policy-list{display:flex;flex-direction:column;gap:6px}
+.policy-rule{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg-elev);border:1px solid var(--border-subtle);border-radius:var(--radius);font-size:12px}
+.policy-pattern{font-family:var(--font-mono);font-size:11px;flex:1}
+.policy-decision{font-family:var(--font-mono);font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px}
+.policy-allow{background:var(--green-dim);color:var(--green)}
+.policy-ask{background:var(--amber-dim);color:var(--amber)}
+.policy-deny{background:var(--red-dim);color:var(--red)}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PUBLIC WEBSITE (Product A — agentswarm.in)
+     ═══════════════════════════════════════════════════════════ -->
+<div id="publicSite">
+  <nav class="pub-nav" role="navigation" aria-label="Main navigation">
+    <div class="pub-nav-left">
+      <a href="#" class="pub-logo" aria-label="AgentSwarm home">
+        <div class="pub-logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
+        Agent<em>Swarm</em>
+      </a>
+      <div class="pub-links">
+        <a href="#product">Product</a>
+        <a href="#platform">Platform</a>
+        <a href="#developers">Developers</a>
+        <a href="#pillars">Resources</a>
+      </div>
+    </div>
+    <div class="pub-nav-right">
+      <button class="btn btn-ghost" onclick="switchToApp()">Sign in</button>
+      <button class="btn btn-primary" onclick="switchToApp(true)">Start Building →</button>
+    </div>
+  </nav>
+
+  <section class="pub-hero">
+    <h1>Build AI Workforces That <em>Actually Get Work Done.</em></h1>
+    <p>AgentSwarm turns complex goals into coordinated teams of AI agents, models, tools, verification systems, and human approvals. One goal. A governed swarm. Verified work.</p>
+    <div class="pub-hero-ctas">
+      <button class="btn btn-primary btn-lg" onclick="switchToApp(true)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Launch Command Centre
+      </button>
+      <button class="btn btn-ghost btn-lg" onclick="document.getElementById('platform').scrollIntoView({behavior:'smooth'})">Explore the Platform</button>
+    </div>
+    <div class="pub-trust">
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg> Multi-model</span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/></svg> MCP-ready</span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Human approvals</span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg> Evidence-backed</span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> Production runtime</span>
+    </div>
+  </section>
+
+  <section class="pub-section" id="product">
+    <div class="pub-section-inner">
+      <h2>From <em>Intent</em> to <em>Outcome</em>.</h2>
+      <p class="subtitle">Describe the goal. AgentSwarm plans the work, creates the workforce, executes, verifies, and delivers.</p>
+      <div class="lifecycle-flow">
+        <div class="lifecycle-step"><span class="num">1</span>Intent</div>
+        <div class="lifecycle-step"><span class="num">2</span>Understand</div>
+        <div class="lifecycle-step"><span class="num">3</span>Plan</div>
+        <div class="lifecycle-step"><span class="num">4</span>Decompose</div>
+        <div class="lifecycle-step"><span class="num">5</span>Route</div>
+        <div class="lifecycle-step"><span class="num">6</span>Spawn</div>
+        <div class="lifecycle-step"><span class="num">7</span>Execute</div>
+        <div class="lifecycle-step"><span class="num">8</span>Observe</div>
+        <div class="lifecycle-step"><span class="num">9</span>Approve</div>
+        <div class="lifecycle-step"><span class="num">10</span>Verify</div>
+        <div class="lifecycle-step"><span class="num">11</span>Deliver</div>
+        <div class="lifecycle-step"><span class="num">12</span>Learn</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pub-section" id="platform">
+    <div class="pub-section-inner">
+      <h2>The <em>Platform</em>.</h2>
+      <p class="subtitle">Six layers that turn goals into verified outcomes.</p>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+          <h3>Dynamic Workforce</h3>
+          <p>Agents, subagents, parallel workers, reducers, reviewers, and supervisors — spawned based on mission complexity, not fixed roles.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+          <h3>Model Fabric</h3>
+          <p>Multiple providers, capability routing, fallback, cost-aware execution, privacy-aware routing. Provider-agnostic by design.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div>
+          <h3>Tool Gateway</h3>
+          <p>MCP, HTTP tools, browser, filesystem, databases, Git, APIs — every call passes through policy, approval, and audit.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+          <h3>Governance</h3>
+          <p>ALLOW · ASK · DENY. Human approval gates for production deploys, external side effects, database writes, and security-sensitive operations.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+          <h3>Evidence & Provenance</h3>
+          <p>Every claim traceable. Hashed artifacts. Tool-call lineage. Independent verification. No black boxes.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+          <h3>Long-Running Work</h3>
+          <p>Queues, background jobs, resumability, retries, checkpoints, scheduling. Work that survives restarts and network failures.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pub-section">
+    <div class="pub-section-inner">
+      <h2>Built for <em>every workload</em>.</h2>
+      <p class="subtitle">From software engineering to compliance, AgentSwarm orchestrates the right workforce for the job.</p>
+      <div class="use-case-grid">
+        <div class="use-case-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>Software Engineering</div>
+        <div class="use-case-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Research</div>
+        <div class="use-case-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Security</div>
+        <div class="use-case-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>Marketing</div>
+        <div class="use-case-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>SEO</div>
+        <div class="use-case-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>Data Analysis</div>
+        <div class="use-case-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>Operations</div>
+        <div class="use-case-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Documentation</div>
+        <div class="use-case-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>QA</div>
+        <div class="use-case-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>DevOps</div>
+        <div class="use-case-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Compliance</div>
+        <div class="use-case-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Customer Support</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pub-section" id="pillars">
+    <div class="pub-section-inner">
+      <h2>100 <em>Authoritative Resources</em>.</h2>
+      <p class="subtitle">Deep, evidence-based pillars on AI agents, swarms, model routing, MCP, memory, skills, verification, and production operations.</p>
+      <div class="pillar-preview">
+        <div class="pillar-card"><div class="cluster">CLUSTER 01 · FUNDAMENTALS</div><h4>What Is an AI Agent?</h4><p>Architecture, memory, tools, planning, reasoning, and the difference between agents, chatbots, and LLM applications.</p></div>
+        <div class="pillar-card"><div class="cluster">CLUSTER 03 · SWARMS</div><h4>What Is an Agent Swarm?</h4><p>Horizontal scaling, parallel execution, dynamic spawning, task decomposition, and result aggregation.</p></div>
+        <div class="pillar-card"><div class="cluster">CLUSTER 04 · ROUTING</div><h4>What Is Model Routing?</h4><p>Capability-based, cost-aware, latency-aware, and privacy-aware routing across multiple providers.</p></div>
+        <div class="pillar-card"><div class="cluster">CLUSTER 06 · MCP</div><h4>Model Context Protocol</h4><p>MCP server architecture, tools, security, permissions, and building an MCP-based agent platform.</p></div>
+        <div class="pillar-card"><div class="cluster">CLUSTER 07 · MEMORY</div><h4>AI Agent Memory</h4><p>Working memory, long-term memory, context compaction, skills, and self-improving systems.</p></div>
+        <div class="pillar-card"><div class="cluster">CLUSTER 08 · SECURITY</div><h4>AI Agent Security</h4><p>Permissions, human-in-the-loop, approval gates, sandboxing, prompt injection defense, and audit logs.</p></div>
+        <div class="pillar-card"><div class="cluster">CLUSTER 09 · VERIFICATION</div><h4>AI Agent Verification</h4><p>Output verification, evidence provenance, artifact management, replay, and production acceptance testing.</p></div>
+        <div class="pillar-card"><div class="cluster">CLUSTER 10 · OPERATIONS</div><h4>Production AI Operations</h4><p>Observability, cost optimization, scheduling, background workers, reliability, and incident management.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pub-section" id="developers">
+    <div class="pub-section-inner">
+      <h2>Built for <em>developers</em>.</h2>
+      <p class="subtitle">SDK, API, MCP, webhooks, events, skills, and examples. API-first, provider-agnostic, evidence-driven.</p>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+          <h3>REST + SSE API</h3>
+          <p>Full CRUD for missions, tasks, agents, approvals, evidence, artifacts, memory, skills, MCP, and schedules. Real-time event streaming with cursor-based resume.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div>
+          <h3>SDKs</h3>
+          <p>TypeScript, Python, and Go SDKs with typed clients, retry logic, and webhook helpers.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+          <h3>MCP Native</h3>
+          <p>Connect any MCP server. Registry, permissions, health checks, and progressive tool loading.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pub-section" style="text-align:center;background:radial-gradient(ellipse at center,rgba(255,90,31,0.08) 0%,transparent 70%)">
+    <div class="pub-section-inner">
+      <h2>Give AgentSwarm the goal. <em>Build the workforce.</em></h2>
+      <p class="subtitle" style="margin-left:auto;margin-right:auto">Launch the Command Centre and see the full mission lifecycle in action.</p>
+      <button class="btn btn-primary btn-lg" onclick="switchToApp(true)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Launch Command Centre
+      </button>
+    </div>
+  </section>
+
+  <footer class="pub-footer">
+    <div class="pub-footer-inner">
+      <div class="pub-footer-grid">
+        <div>
+          <div class="pub-logo" style="margin-bottom:12px">
+            <div class="pub-logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
+            Agent<em>Swarm</em>
+          </div>
+          <p style="font-size:13px;color:var(--text-dim);max-width:320px;line-height:1.6">The control plane for AI workforces. Plan missions, deploy specialist agents, observe execution, approve actions, and verify results.</p>
+        </div>
+        <div>
+          <h5>Product</h5>
+          <ul>
+            <li><a href="#product">Platform</a></li>
+            <li><a href="#developers">Developers</a></li>
+            <li><a href="#">Pricing</a></li>
+            <li><a href="#">Changelog</a></li>
+          </ul>
+        </div>
+        <div>
+          <h5>Resources</h5>
+          <ul>
+            <li><a href="#">Documentation</a></li>
+            <li><a href="#">Guides</a></li>
+            <li><a href="#">Glossary</a></li>
+            <li><a href="#">Research</a></li>
+          </ul>
+        </div>
+        <div>
+          <h5>Company</h5>
+          <ul>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Security</a></li>
+            <li><a href="#">Status</a></li>
+            <li><a href="#">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="pub-footer-bottom">
+        <span>© 2025 AgentSwarm.in · Built for builders. Governed for trust. Verified for impact.</span>
+        <span class="sl sl-sim">DEMO SITE</span>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     APP (Product B — app.agentswarm.in)
+     ═══════════════════════════════════════════════════════════ -->
+<div id="appSite" style="display:none">
+  <header class="app-topbar" role="banner">
+    <div class="app-topbar-left">
+      <div class="app-topbar-logo">
+        <div class="pub-logo-icon" style="width:26px;height:26px;border-radius:6px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:14px;height:14px"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        </div>
+        Agent<em>Swarm</em>
+      </div>
+      <span class="demo-badge">Demo Workspace</span>
+      <div class="api-status connected" id="apiStatus">
+        <span class="dot"></span>
+        <span>API Connected</span>
+      </div>
+    </div>
+    <div class="app-topbar-center">
+      <span class="kbd-hint">⌘K</span>
+      <span style="font-size:11px;color:var(--text-muted)">Commands</span>
+    </div>
+    <div class="app-topbar-right">
+      <button class="topbar-btn" aria-label="Notifications" id="notifBtn" title="Approvals">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="badge" id="notifBadge" style="display:none">0</span>
+      </button>
+      <button class="topbar-btn" onclick="switchToPublic()" title="Back to website" aria-label="Back to website">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="app-layout" id="appLayout">
+    <nav class="sidebar" role="navigation" aria-label="Main navigation">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Workspace</div>
+        <div class="sidebar-item active" data-view="command" tabindex="0" role="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          Command Centre
+        </div>
+        <div class="sidebar-item" data-view="missions" tabindex="0" role="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          Swarms
+          <span class="count" id="swarmCount">0</span>
+        </div>
+        <div class="sidebar-item" data-view="tasks" tabindex="0" role="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          Tasks
+        </div>
+        <div class="sidebar-item" data-view="agents" tabindex="0" role="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Agents
+          <span class="count" id="agentCount">0</span>
+        </div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Observe</div>
+        <div class="sidebar-item" data-view="approvals" tabindex="0" role="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Approvals
+          <span class="count" id="approvalCount">0</span>
+        </div>
+        <div class="sidebar-item" data-view="evidence" tabindex="0" role="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Evidence
+        </div>
+        <div class="sidebar-item" data-view="artifacts" tabindex="0" role="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+          Artifacts
+        </div>
+        <div class="sidebar-item" data-view="costs" tabindex="0" role="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          Costs
+        </div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">System</div>
+        <div class="sidebar-item" data-view="models" tabindex="0" role="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          Models
+        </div>
+        <div class="sidebar-item" data-view="policy" tabindex="0" role="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Policy
+        </div>
+        <div class="sidebar-item" data-view="memory" tabindex="0" role="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"/><path d="M12 6v6l4 2"/></svg>
+          Memory
+        </div>
+        <div class="sidebar-item" data-view="skills" tabindex="0" role="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          Skills
+        </div>
+        <div class="sidebar-item" data-view="mcp" tabindex="0" role="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          MCP / Tools
+        </div>
+        <div class="sidebar-item" data-view="capabilities" tabindex="0" role="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          Capabilities
+        </div>
+      </div>
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar">AO</div>
+        <div class="sidebar-user-info">
+          <div>Alex Operator</div>
+          <small>Demo Workspace</small>
+        </div>
+      </div>
+    </nav>
+
+    <main class="main-content" id="mainContent" role="main"></main>
+
+    <aside class="inspector" id="inspectorPanel" role="complementary" aria-label="Inspector">
+      <div class="inspector-header">Inspector</div>
+      <div id="inspectorContent">
+        <div class="empty-state">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          <h3>Select an item</h3>
+          <p>Click an agent, task, or event to inspect details</p>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <nav class="mobile-nav" role="navigation" aria-label="Mobile navigation">
+    <div class="mobile-nav-inner">
+      <div class="mobile-nav-item active" data-mview="home">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        Home
+      </div>
+      <div class="mobile-nav-item" data-mview="swarms">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Swarms
+      </div>
+      <div class="mobile-nav-item center-btn" data-mview="new">
+        <div class="center-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </div>
+        New
+      </div>
+      <div class="mobile-nav-item" data-mview="agents">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        Agents
+      </div>
+      <div class="mobile-nav-item" data-mview="more">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+        More
+      </div>
+    </div>
+  </nav>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     OVERLAYS
+     ═══════════════════════════════════════════════════════════ -->
+<div class="composer-overlay" id="composerOverlay" style="display:none" role="dialog" aria-modal="true" aria-label="Mission composer">
+  <div class="composer">
+    <h2>What shall we build <em>today?</em></h2>
+    <p class="composer-sub">One goal. A swarm of specialists. Real evidence. <span class="sl sl-sim">SIMULATED</span></p>
+    <textarea class="composer-input" id="composerInput" placeholder="Describe a goal, paste a task, or select a quick-start mission..." aria-label="Mission goal"></textarea>
+    <div style="margin-top:14px">
+      <div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:6px;letter-spacing:0.06em;text-transform:uppercase">Execution Mode</div>
+      <div class="composer-modes" role="radiogroup" aria-label="Mission mode">
+        <button class="composer-mode" data-mode="INSTANT" title="Single short model execution">INSTANT</button>
+        <button class="composer-mode" data-mode="THINK" title="Reasoning-heavy single agent">THINK</button>
+        <button class="composer-mode" data-mode="AGENT" title="Single autonomous agent">AGENT</button>
+        <button class="composer-mode active" data-mode="SWARM" title="Dynamic multi-agent execution">SWARM</button>
+        <button class="composer-mode" data-mode="AUTO" title="System chooses architecture">AUTO</button>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:6px;letter-spacing:0.06em;text-transform:uppercase">Quick Start</div>
+      <div class="composer-quick">
+        <button class="composer-quick-item" data-goal="Build an analytics SaaS dashboard with authentication, billing and deployment">Build a SaaS dashboard</button>
+        <button class="composer-quick-item" data-goal="Deep research the AI agent orchestration market and produce a competitor report">Deep research a market</button>
+        <button class="composer-quick-item" data-goal="Design and build a responsive marketing website">Design a website</button>
+        <button class="composer-quick-item" data-goal="Analyze a customer dataset for churn patterns and produce recommendations">Analyze a dataset</button>
+        <button class="composer-quick-item" data-goal="Audit the codebase for security vulnerabilities and prepare a fix PR">Audit a codebase</button>
+        <button class="composer-quick-item" data-goal="Create technical documentation for the public API">Create documentation</button>
+        <button class="composer-quick-item" data-goal="Deploy the project to production with smoke tests">Deploy a project</button>
+        <button class="composer-quick-item" data-goal="Run a comprehensive security review with evidence report">Security review</button>
+      </div>
+    </div>
+    <div class="composer-actions">
+      <button class="btn btn-ghost" id="composerCancel">Cancel</button>
+      <button class="btn btn-primary" id="composerStart">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Start Mission
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="cmd-overlay" id="cmdOverlay" style="display:none" role="dialog" aria-modal="true" aria-label="Command palette">
+  <div class="cmd-palette">
+    <input class="cmd-input" id="cmdInput" placeholder="Type a command..." aria-label="Command search">
+    <div class="cmd-list" id="cmdList" role="listbox"></div>
+  </div>
+</div>
+
+<div class="bottom-sheet-overlay" id="sheetOverlay"></div>
+<div class="bottom-sheet" id="bottomSheet" role="dialog" aria-modal="true">
+  <div class="bottom-sheet-handle"></div>
+  <div id="sheetContent"></div>
+</div>
+
+<div class="notification" id="notification" role="alert" aria-live="polite"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   AgentSwarm v100 — Production Frontend
+   Browser is projection. Backend is authority (simulated here).
+   Canonical contracts: Mission, Task, Agent, Tool, Approval,
+   Evidence, Artifact, Verification, ModelInvocation, DomainEvent.
+   ══════════════════════════════════════════════════════════════ */
+
+// ─── Demo Backend Service ───
+class DemoBackendService {
+  constructor() {
+    this.missions = []; this.tasks = []; this.agents = [];
+    this.events = []; this.approvals = []; this.evidence = [];
+    this.artifacts = []; this.memories = []; this.skills = [];
+    this.mcpServers = []; this.models = [];
+    this.sequence = 0; this.sseListeners = [];
+  }
+
+  initDemoData() {
+    this.agents = [
+      {id:'planner',name:'Planner',role:'Strategy & Orchestration',color:'#FF5A1F',tools:['filesystem','memory'],model:'qwen-max',sandbox:'planner-sbx',budget:0.06,status:'IDLE',currentTask:null,progress:0,cost:0,tokenIn:0,tokenOut:0,capabilities:['planning','decomposition']},
+      {id:'research',name:'Research Analyst',role:'Research & Intelligence',color:'#a855f7',tools:['fetch','browser'],model:'qwen-max',sandbox:'research-sbx',budget:0.12,status:'IDLE',currentTask:null,progress:0,cost:0,tokenIn:0,tokenOut:0,capabilities:['research','synthesis']},
+      {id:'architect',name:'Architect',role:'System Design',color:'#3b82f6',tools:['filesystem','memory'],model:'qwen-max',sandbox:'architect-sbx',budget:0.08,status:'IDLE',currentTask:null,progress:0,cost:0,tokenIn:0,tokenOut:0,capabilities:['architecture','design']},
+      {id:'backend',name:'Backend Developer',role:'API & Database',color:'#3b82f6',tools:['terminal','postgres','filesystem'],model:'qwen-max',sandbox:'backend-sbx',budget:0.17,status:'IDLE',currentTask:null,progress:0,cost:0,tokenIn:0,tokenOut:0,capabilities:['coding','api','database']},
+      {id:'frontend',name:'Frontend Developer',role:'UI & Experience',color:'#FF5A1F',tools:['terminal','filesystem'],model:'qwen-max',sandbox:'frontend-sbx',budget:0.14,status:'IDLE',currentTask:null,progress:0,cost:0,tokenIn:0,tokenOut:0,capabilities:['coding','ui','frontend']},
+      {id:'qa',name:'QA Engineer',role:'Testing & Quality',color:'#22c55e',tools:['terminal','filesystem'],model:'qwen-max',sandbox:'qa-sbx',budget:0.07,status:'IDLE',currentTask:null,progress:0,cost:0,tokenIn:0,tokenOut:0,capabilities:['testing','qa']},
+      {id:'security',name:'Security Reviewer',role:'Security & Compliance',color:'#ef4444',tools:['terminal','filesystem','fetch'],model:'qwen-max',sandbox:'security-sbx',budget:0.09,status:'IDLE',currentTask:null,progress:0,cost:0,tokenIn:0,tokenOut:0,capabilities:['security','audit']},
+      {id:'devops',name:'DevOps Engineer',role:'Deployment & Infrastructure',color:'#14b8a6',tools:['terminal','filesystem','fetch'],model:'qwen-max',sandbox:'devops-sbx',budget:0.06,status:'IDLE',currentTask:null,progress:0,cost:0,tokenIn:0,tokenOut:0,capabilities:['deployment','infrastructure']},
+    ];
+
+    this.models = [
+      {id:'qwen-max',provider:'Qwen',name:'qwen-max',capabilities:{reasoning:9,coding:8,research:7,toolCalling:true,mcp:true,contextWindow:32768},costTier:'medium',latency:'medium',status:'AVAILABLE',truthState:'LIVE_PROVIDER'},
+      {id:'qwen-plus',provider:'Qwen',name:'qwen-plus',capabilities:{reasoning:7,coding:7,research:7,toolCalling:true,mcp:true,contextWindow:131072},costTier:'low',latency:'fast',status:'AVAILABLE',truthState:'LIVE_PROVIDER'},
+      {id:'local-llama',provider:'Local',name:'llama-3.1-70b',capabilities:{reasoning:7,coding:7,research:6,toolCalling:true,mcp:false,contextWindow:8192,local:true},costTier:'free',latency:'variable',status:'AVAILABLE',truthState:'LIVE_LOCAL'},
+    ];
+
+    this.mcpServers = [
+      {id:'filesystem',name:'Filesystem',status:'UNAVAILABLE',tools:['read_file','write_file','list_dir','watch'],transport:'not_configured',health:'unknown'},
+      {id:'git',name:'Git',status:'UNAVAILABLE',tools:['commit','push','pull','branch','status'],transport:'not_configured',health:'unknown'},
+      {id:'browser',name:'Browser',status:'UNAVAILABLE',tools:['navigate','screenshot','extract','click'],transport:'not_configured',health:'unknown'},
+      {id:'postgres',name:'Postgres',status:'UNAVAILABLE',tools:['query','migrate','schema'],transport:'not_configured',health:'unknown'},
+      {id:'fetch',name:'Fetch',status:'UNAVAILABLE',tools:['http_get','http_post','http_put','http_delete'],transport:'not_configured',health:'unknown'},
+    ];
+
+    this.memories = [
+      {id:'mem1',cat:'Project',text:'We use TypeScript for all services.'},
+      {id:'mem2',cat:'Project',text:'Primary package manager: pnpm.'},
+      {id:'mem3',cat:'User',text:'Preferred UI: technical dark mode.'},
+      {id:'mem4',cat:'Mission',text:'All deployments require approval gate.'},
+      {id:'mem5',cat:'Organization',text:'Budget cap per mission: $5.00 (demo).'},
+    ];
+
+    this.skills = [
+      {id:'skill1',name:'deploy-vercel',version:'2.1.0',steps:5,tools:['terminal','filesystem'],success:'HTTP 200 from deployment endpoint',lastUsed:'2d ago',description:'Deploy a web project to Vercel with preview URLs.'},
+      {id:'skill2',name:'run-security-audit',version:'1.4.0',steps:4,tools:['terminal','fetch'],success:'0 critical findings',lastUsed:'5d ago',description:'Run comprehensive security audit with evidence report.'},
+      {id:'skill3',name:'create-react-dashboard',version:'3.0.0',steps:8,tools:['terminal','filesystem','postgres'],success:'Build passes, tests green',lastUsed:'1d ago',description:'Scaffold a React dashboard with auth and data layer.'},
+      {id:'skill4',name:'generate-seo-report',version:'1.0.0',steps:3,tools:['browser','fetch'],success:'Report generated',lastUsed:'12d ago',description:'Analyze a website and produce an SEO improvement report.'},
+    ];
+  }
+
+  nextSequence() { return ++this.sequence; }
+
+  async emitEvent(event) {
+    event.sequence = this.nextSequence();
+    event.timestamp = new Date().toISOString();
+    event.id = 'e_' + event.sequence;
+    this.events.push(event);
+    this.sseListeners.forEach(cb => cb(event));
+    return event;
+  }
+
+  async createMission(goal, mode) {
+    const mission = {
+      id: 'm_' + Math.random().toString(36).substr(2, 8),
+      goal, mode,
+      executionState: 'DRAFT',
+      truthState: 'SIMULATED',
+      createdAt: new Date().toISOString(),
+      runId: '#' + Math.random().toString(36).substr(2, 6),
+      agents: 0, tasks: 0, tools: 0,
+      cost: 0, progress: 0,
+      budget: 5.00
+    };
+    this.missions.push(mission);
+    await this.emitEvent({missionId: mission.id, actor:'System', type:'MISSION_CREATED', detail: goal, truthState:'SIMULATED'});
+    return mission;
+  }
+
+  async updateMission(id, updates) {
+    const m = this.missions.find(x => x.id === id);
+    if (m) Object.assign(m, updates);
+    return m;
+  }
+
+  async createTasks(missionId, tasks) {
+    tasks.forEach(t => {
+      t.missionId = missionId;
+      t.executionState = 'PENDING';
+      t.progress = 0;
+      this.tasks.push(t);
+    });
+    const mission = this.missions.find(m => m.id === missionId);
+    if (mission) { mission.tasks = tasks.length; mission.agents = new Set(tasks.map(t=>t.agent)).size; }
+    return tasks;
+  }
+
+  async getTasks(missionId) { return this.tasks.filter(t => t.missionId === missionId); }
+  async updateTask(id, updates) {
+    const t = this.tasks.find(x => x.id === id);
+    if (t) Object.assign(t, updates);
+    return t;
+  }
+
+  async createApproval(approval) {
+    approval.id = 'a_' + Math.random().toString(36).substr(2, 6);
+    approval.executionState = 'PENDING';
+    approval.createdAt = new Date().toISOString();
+    this.approvals.push(approval);
+    return approval;
+  }
+
+  async decideApproval(id, decision, decidedBy='Alex Operator') {
+    const a = this.approvals.find(x => x.id === id);
+    if (a) {
+      a.executionState = decision === 'approve' ? 'APPROVED' : 'REJECTED';
+      a.decision = decision;
+      a.decidedBy = decidedBy;
+      a.decidedAt = new Date().toISOString();
+    }
+    return a;
+  }
+
+  async getPendingApprovals() { return this.approvals.filter(a => a.executionState === 'PENDING'); }
+
+  async addEvidence(e) {
+    e.id = 'ev_' + Math.random().toString(36).substr(2, 6);
+    e.collectedAt = new Date().toISOString();
+    e.truthState = 'SIMULATED';
+    this.evidence.push(e);
+    return e;
+  }
+
+  async createArtifact(a) {
+    a.id = 'art_' + Math.random().toString(36).substr(2, 6);
+    a.sha256 = 'sim_' + Math.random().toString(36).substr(2, 16);
+    a.createdAt = new Date().toISOString();
+    a.truthState = 'SIMULATED';
+    this.artifacts.push(a);
+    return a;
+  }
+
+  async addMemory(m) { m.id = 'mem_' + Math.random().toString(36).substr(2, 6); this.memories.push(m); return m; }
+  async deleteMemory(id) { this.memories = this.memories.filter(m => m.id !== id); }
+
+  onSSE(cb) { this.sseListeners.push(cb); return () => { this.sseListeners = this.sseListeners.filter(x => x !== cb); }; }
+}
+
+// ─── Application State ───
+const State = {
+  currentMission: null,
+  currentView: 'command',
+  selectedAgent: null,
+  selectedTask: null,
+  traceFilter: 'all',
+  missionMode: 'SWARM',
+  engineRunning: false,
+};
+
+const backend = new DemoBackendService();
+
+// ─── Mode descriptions ───
+const MODE_DESCRIPTIONS = {
+  INSTANT: 'Single short model execution. Best for quick questions and simple transformations.',
+  THINK: 'Reasoning-heavy single agent. Best for complex analysis requiring deep thought.',
+  AGENT: 'Single autonomous agent with tools. Best for focused tasks with clear scope.',
+  SWARM: 'Dynamic multi-agent execution. The planner partitions work across specialist agents based on complexity, parallelism, and policy.',
+  AUTO: 'System chooses architecture automatically based on goal complexity and available resources.',
+};
+
+// ─── Policy Engine (demo rules) ───
+const POLICY_RULES = [
+  {pattern:'filesystem.read',decision:'ALLOW',reason:'Read-only operations are safe'},
+  {pattern:'filesystem.write',decision:'ASK',reason:'Write operations require approval'},
+  {pattern:'filesystem.delete',decision:'DENY',reason:'Destructive operations blocked'},
+  {pattern:'git.status',decision:'ALLOW',reason:'Read-only git operations safe'},
+  {pattern:'git.commit',decision:'ASK',reason:'Commit requires review'},
+  {pattern:'git.push',decision:'ASK',reason:'Push to remote requires approval'},
+  {pattern:'shell.rm',decision:'DENY',reason:'Destructive shell commands blocked'},
+  {pattern:'postgres.query',decision:'ASK',reason:'Database reads require approval'},
+  {pattern:'postgres.write',decision:'DENY',reason:'Database writes blocked in demo'},
+  {pattern:'http.get',decision:'ASK',reason:'External network requests require approval'},
+  {pattern:'http.post',decision:'ASK',reason:'External writes require approval'},
+  {pattern:'secret.read',decision:'DENY',reason:'Secret access blocked'},
+  {pattern:'production.deploy',decision:'ASK',reason:'Production deploys require human approval'},
+];
+
+// ─── Capability Registry ───
+const CAPABILITY_REGISTRY = [
+  {name:'mission_creation',status:'LIVE',version:'1.0.0',lastVerified:'2025-01-15',evidence:'API endpoint verified'},
+  {name:'task_planning',status:'SIMULATED',version:'1.0.0',lastVerified:'2025-01-15',evidence:'Planner uses fixture model'},
+  {name:'model_routing',status:'SIMULATED',version:'1.0.0',lastVerified:'2025-01-15',evidence:'Router uses fixture capabilities'},
+  {name:'tool_gateway',status:'UNAVAILABLE',version:'0.1.0',lastVerified:null,evidence:'No MCP transport configured'},
+  {name:'approval_engine',status:'SIMULATED',version:'1.0.0',lastVerified:'2025-01-15',evidence:'Approval flow demonstrated'},
+  {name:'evidence_ledger',status:'SIMULATED',version:'1.0.0',lastVerified:'2025-01-15',evidence:'Evidence records created'},
+  {name:'verification_engine',status:'SIMULATED',version:'1.0.0',lastVerified:'2025-01-15',evidence:'Verification gates demonstrated'},
+  {name:'artifact_storage',status:'SIMULATED',version:'1.0.0',lastVerified:'2025-01-15',evidence:'Artifacts created with SHA-256'},
+  {name:'sse_streaming',status:'SIMULATED',version:'1.0.0',lastVerified:'2025-01-15',evidence:'Event stream with monotonic sequence'},
+  {name:'policy_engine',status:'SIMULATED',version:'1.0.0',lastVerified:'2025-01-15',evidence:'Policy rules evaluated'},
+  {name:'worker_leasing',status:'UNAVAILABLE',version:'0.1.0',lastVerified:null,evidence:'No durable worker runtime'},
+  {name:'scheduler',status:'UNAVAILABLE',version:'0.1.0',lastVerified:null,evidence:'No cron/interval scheduler'},
+];
+
+// ─── Initialize ───
+function init() {
+  backend.initDemoData();
+  setupEventListeners();
+  render();
+}
+
+// ─── Mission Creation ───
+async function createMission(goal) {
+  const mission = await backend.createMission(goal, State.missionMode);
+  State.currentMission = mission;
+
+  const tasks = [
+    {id:'t1',name:'Requirements & Discovery',agent:'planner',type:'PLANNING',deps:[],duration:3},
+    {id:'t2',name:'Competitor Research',agent:'research',type:'RESEARCH',deps:['t1'],duration:4},
+    {id:'t3',name:'Architecture Design',agent:'architect',type:'PLANNING',deps:['t1'],duration:4},
+    {id:'t4',name:'Backend API',agent:'backend',type:'CODING',deps:['t3'],duration:5},
+    {id:'t5',name:'Frontend UI',agent:'frontend',type:'CODING',deps:['t3'],duration:5},
+    {id:'t6',name:'Integration & QA',agent:'qa',type:'VERIFICATION',deps:['t4','t5'],duration:3},
+    {id:'t7',name:'Security Review',agent:'security',type:'REVIEW',deps:['t4'],duration:3},
+    {id:'t8',name:'Deployment',agent:'devops',type:'DELIVERY',deps:['t6','t7'],duration:3},
+  ];
+  await backend.createTasks(mission.id, tasks);
+
+  await backend.createApproval({
+    risk:'HIGH',title:'Allow external network request?',
+    destination:'api.stripe.com',method:'HTTPS GET',scope:'Payment validation',
+    agent:'backend',task:'Backend API',policyRule:'http.get → ASK'
+  });
+  await backend.createApproval({
+    risk:'MEDIUM',title:'Commit & push proposed changes?',
+    branch:'feat/dashboard',files:14,tests:'42 passed',findings:0,
+    agent:'devops',task:'Deployment',policyRule:'git.push → ASK'
+  });
+
+  await backend.addEvidence({
+    missionId: mission.id,
+    source:'Multi-agent isolation study',sourceType:'WEB',sourceRef:'https://example.com/study',trust:'PRIMARY',
+    claim:'Sandbox isolation reduces cross-task contamination by 94%.',
+    confidence:0.92,supporting:['S1','S2'],contradicting:[]
+  });
+
+  await backend.updateMission(mission.id, {executionState: 'PLANNING'});
+  State.currentMission.executionState = 'PLANNING';
+
+  render();
+  setTimeout(() => startMissionEngine(), 600);
+  notify('Mission created — swarm initializing', 'success');
+}
+
+// ─── Mission Engine ───
+async function startMissionEngine() {
+  if (State.engineRunning) return;
+  State.engineRunning = true;
+
+  const mission = State.currentMission;
+  const tasks = await backend.getTasks(mission.id);
+
+  for (let i = 0; i < tasks.length; i++) {
+    if (!State.engineRunning) break;
+
+    const task = tasks[i];
+    const agent = backend.agents.find(a => a.id === task.agent);
+
+    const depsMet = task.deps.every(depId => {
+      const dep = tasks.find(t => t.id === depId);
+      return dep && dep.executionState === 'SUCCEEDED';
+    });
+    if (!depsMet) {
+      await backend.updateTask(task.id, {executionState: 'BLOCKED'});
+      continue;
+    }
+
+    await backend.updateTask(task.id, {executionState: 'RUNNING'});
+    if (agent) { agent.status = 'RUNNING'; agent.currentTask = task.name; }
+
+    await backend.emitEvent({
+      missionId: mission.id, actor: agent?.name || 'System',
+      type: 'TASK_STARTED', detail: task.name, truthState: 'SIMULATED'
+    });
+
+    State.currentMission.executionState = 'RUNNING';
+    render();
+    await delay(1400);
+
+    if (agent && Math.random() > 0.25) {
+      const toolName = agent.tools[Math.floor(Math.random() * agent.tools.length)];
+      await backend.emitEvent({
+        missionId: mission.id, actor: agent.name,
+        type: 'TOOL_CALLED', detail: `${toolName}.operation`, truthState: 'SIMULATED'
+      });
+      agent.cost = +(agent.cost + 0.01 + Math.random() * 0.02).toFixed(3);
+      agent.tokenIn += Math.floor(Math.random() * 500 + 200);
+      agent.tokenOut += Math.floor(Math.random() * 300 + 100);
+      await delay(800);
+    }
+
+    if (i === 3 || i === 7) {
+      const pending = await backend.getPendingApprovals();
+      if (pending.length > 0) {
+        State.currentMission.executionState = 'WAITING_APPROVAL';
+        render();
+        await waitForApproval();
+        if (!State.engineRunning) break;
+      }
+    }
+
+    await backend.updateTask(task.id, {executionState: 'SUCCEEDED', progress: 100});
+    if (agent) { agent.status = 'IDLE'; agent.currentTask = null; agent.progress = 100; }
+
+    await backend.emitEvent({
+      missionId: mission.id, actor: agent?.name || 'System',
+      type: 'TASK_COMPLETED', detail: task.name, truthState: 'SIMULATED'
+    });
+
+    const completed = tasks.filter(t => t.executionState === 'SUCCEEDED').length;
+    const progress = Math.round((completed / tasks.length) * 100);
+    await backend.updateMission(mission.id, {progress});
+    State.currentMission.progress = progress;
+
+    render();
+    await delay(400);
+  }
+
+  State.currentMission.executionState = 'VERIFYING';
+  await backend.updateMission(mission.id, {executionState: 'VERIFYING'});
+  await backend.emitEvent({missionId: mission.id, actor:'System', type:'VERIFICATION_STARTED', detail:'Running independent verification gates', truthState:'SIMULATED'});
+  render();
+  await delay(1200);
+
+  await backend.createArtifact({missionId: mission.id, name:'Dashboard.tsx', type:'Code', version:'v3', createdBy:'Frontend Developer', task:'Frontend UI', mimeType:'text/typescript', size:4280});
+  await backend.createArtifact({missionId: mission.id, name:'Architecture Diagram', type:'Diagram', version:'v2', createdBy:'Architect', task:'Architecture Design', mimeType:'image/svg+xml', size:12400});
+  await backend.createArtifact({missionId: mission.id, name:'Research Report', type:'Report', version:'v1', createdBy:'Research Analyst', task:'Competitor Research', mimeType:'text/markdown', size:8900});
+  await backend.createArtifact({missionId: mission.id, name:'Security Report', type:'Report', version:'v1', createdBy:'Security Reviewer', task:'Security Review', mimeType:'text/markdown', size:5600});
+
+  await backend.updateMission(mission.id, {executionState: 'COMPLETED', progress: 100});
+  State.currentMission.executionState = 'COMPLETED';
+  State.engineRunning = false;
+
+  await backend.emitEvent({missionId: mission.id, actor:'System', type:'MISSION_COMPLETED', detail:'All gates passed. Mission verified.', truthState:'SIMULATED'});
+  render();
+  notify('Mission verified — all gates passed', 'success');
+}
+
+function waitForApproval() {
+  return new Promise(resolve => {
+    const check = setInterval(() => {
+      backend.getPendingApprovals().then(a => {
+        if (a.length === 0) { clearInterval(check); resolve(); }
+      });
+    }, 400);
+  });
+}
+
+async function handleApproval(id, decision) {
+  await backend.decideApproval(id, decision);
+  await backend.emitEvent({
+    missionId: State.currentMission?.id,
+    actor: 'Approval',
+    type: decision === 'approve' ? 'APPROVAL_GRANTED' : 'APPROVAL_REJECTED',
+    detail: `Decision: ${decision.toUpperCase()}`,
+    truthState: 'SIMULATED'
+  });
+  notify(decision === 'approve' ? 'Approval granted' : 'Approval rejected — downstream tasks affected', decision === 'approve' ? 'success' : 'error');
+  render();
+}
+
+function stopMission() {
+  State.engineRunning = false;
+  if (State.currentMission) {
+    backend.updateMission(State.currentMission.id, {executionState: 'CANCELLED'});
+    State.currentMission.executionState = 'CANCELLED';
+  }
+  notify('Mission stopped', 'error');
+  render();
+}
+
+function pauseMission() {
+  State.engineRunning = false;
+  if (State.currentMission) {
+    backend.updateMission(State.currentMission.id, {executionState: 'PAUSED'});
+    State.currentMission.executionState = 'PAUSED';
+  }
+  notify('Mission paused', 'info');
+  render();
+}
+
+function resetDemo() {
+  State.engineRunning = false;
+  State.currentMission = null;
+  State.currentView = 'command';
+  State.selectedAgent = null;
+  State.selectedTask = null;
+  backend.missions = []; backend.tasks = []; backend.events = [];
+  backend.approvals = []; backend.artifacts = []; backend.evidence = [];
+  backend.sequence = 0;
+  backend.agents.forEach(a => { a.status='IDLE'; a.currentTask=null; a.progress=0; a.cost=0; a.tokenIn=0; a.tokenOut=0; });
+  showComposer();
+  notify('Demo reset', 'info');
+}
+
+// ─── Render Router ──
+function render() {
+  const main = document.getElementById('mainContent');
+  if (!State.currentMission) { main.innerHTML = renderEmptyState(); return; }
+  switch(State.currentView) {
+    case 'command': main.innerHTML = renderCommandCentre(); break;
+    case 'missions': main.innerHTML = renderMissionsView(); break;
+    case 'tasks': main.innerHTML = renderTasksView(); break;
+    case 'agents': main.innerHTML = renderAgentsView(); break;
+    case 'approvals': main.innerHTML = renderApprovalsView(); break;
+    case 'evidence': main.innerHTML = renderEvidenceView(); break;
+    case 'artifacts': main.innerHTML = renderArtifactsView(); break;
+    case 'costs': main.innerHTML = renderCostsView(); break;
+    case 'models': main.innerHTML = renderModelsView(); break;
+    case 'policy': main.innerHTML = renderPolicyView(); break;
+    case 'memory': main.innerHTML = renderMemoryView(); break;
+    case 'skills': main.innerHTML = renderSkillsView(); break;
+    case 'mcp': main.innerHTML = renderMCPView(); break;
+    case 'capabilities': main.innerHTML = renderCapabilitiesView(); break;
+    default: main.innerHTML = renderCommandCentre();
+  }
+  updateInspector();
+  updateCounts();
+  attachViewHandlers();
+}
+
+function renderEmptyState() {
+  return `
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center" class="fade-in">
+      <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="1.2" style="margin-bottom:24px;opacity:0.9">
+        <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+      </svg>
+      <h2 style="font-size:24px;font-weight:800;margin-bottom:10px;letter-spacing:-0.02em">No active mission</h2>
+      <p style="color:var(--text-dim);font-size:14px;margin-bottom:28px;max-width:440px;line-height:1.6">
+        Describe a goal and AgentSwarm will orchestrate a swarm of specialist agents to execute it.
+      </p>
+      <button class="btn btn-primary btn-lg" onclick="showComposer()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Start a Mission
+      </button>
+    </div>
+  `;
+}
+
+function renderCommandCentre() {
+  const m = State.currentMission;
+  const statusClass = 'status-' + m.executionState.toLowerCase();
+  const tasks = backend.tasks.filter(t => t.missionId === m.id);
+  const completedTasks = tasks.filter(t => t.executionState === 'SUCCEEDED').length;
+  const runningTasks = tasks.filter(t => t.executionState === 'RUNNING').length;
+  const pendingApprovals = backend.approvals.filter(a => a.executionState === 'PENDING').length;
+  const totalCost = backend.agents.reduce((s, a) => s + a.cost, 0);
+  const totalTokens = backend.agents.reduce((s, a) => s + a.tokenIn + a.tokenOut, 0);
+
+  return `
+    <div class="main-header fade-in">
+      <div class="mission-title-row">
+        <h1 class="mission-title">${esc(m.goal)}</h1>
+        <span class="mission-status ${statusClass}">${m.executionState.replace('_',' ')}</span>
+        <span class="sl sl-sim">SIMULATED</span>
+      </div>
+      <div class="mission-meta">
+        <span>Started ${timeAgo(m.createdAt)}</span>
+        <span class="mono">Run ID: ${m.runId}</span>
+        <span>Mode: ${m.mode}</span>
+        <span>${m.agents} agents · ${m.tasks} tasks</span>
+      </div>
+    </div>
+
+    <div class="truth-banner fade-in">
+      <div class="truth-icon sim">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"/><path d="M12 8v4M12 16h.01"/></svg>
+      </div>
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:12px;margin-bottom:2px">Truth State: <span class="sl sl-sim" style="margin-left:4px">${m.truthState}</span></div>
+        <div style="font-size:11px;color:var(--text-dim)">Execution state: ${m.executionState} · All telemetry in this demo is simulated. In production, truth state reflects actual provider/runtime evidence.</div>
+      </div>
+    </div>
+
+    <div class="kpi-row fade-in">
+      <div class="kpi-card">
+        <div class="kpi-label">Active Agents</div>
+        <div class="kpi-value">${runningTasks > 0 ? runningTasks : (completedTasks > 0 ? completedTasks : 0)}</div>
+        <div class="kpi-sub ${runningTasks>0?'positive':''}">${runningTasks > 0 ? '+'+runningTasks+' running' : (completedTasks > 0 ? completedTasks+' completed' : 'idle')}</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Tasks Completed</div>
+        <div class="kpi-value">${completedTasks}<span style="font-size:14px;color:var(--text-muted)">/${tasks.length}</span></div>
+        <div class="kpi-sub positive">+${completedTasks} today</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Tokens Used</div>
+        <div class="kpi-value">${(totalTokens/1000).toFixed(1)}K</div>
+        <div class="kpi-sub">+${(backend.agents.reduce((s,a)=>s+a.tokenIn,0)/1000).toFixed(1)}K in</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Est. Cost</div>
+        <div class="kpi-value">$${totalCost.toFixed(2)}</div>
+        <div class="kpi-sub unknown">Budget: $${m.budget.toFixed(2)} · <span class="sl sl-fix" style="font-size:9px">FIXTURE</span></div>
+      </div>
+    </div>
+
+    <div class="section fade-in">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <span style="font-size:12px;font-weight:700">Overall Progress</span>
+        <span class="mono" style="font-size:12px;font-weight:700">${m.progress}%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" style="width:${m.progress}%"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:10px;color:var(--text-muted)">
+        <span>Docker Sandbox · 2 vCPU · 4GB RAM</span>
+        <span style="color:var(--green)">● Healthy</span>
+      </div>
+    </div>
+
+    <div class="section fade-in">
+      <div class="section-header">
+        <div class="section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+          Task DAG
+        </div>
+        <span class="section-action" onclick="switchView('tasks')">View all tasks ›</span>
+      </div>
+      <div class="dag-container">
+        ${renderDAG(tasks)}
+      </div>
+    </div>
+
+    <div class="section fade-in">
+      <div class="section-header">
+        <div class="section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Active Agents
+        </div>
+        <span class="section-action" onclick="switchView('agents')">View all ›</span>
+      </div>
+      <div class="agent-list">
+        ${backend.agents.map(a => renderAgentCard(a)).join('')}
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px" class="fade-in">
+      <div>
+        <div class="section-header">
+          <div class="section-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Activity Trace
+            <span style="color:var(--green);font-size:10px;margin-left:4px;font-family:var(--font-mono)">LIVE ●</span>
+          </div>
+        </div>
+        <div class="trace-container">
+          <div class="trace-filters">
+            <button class="trace-filter ${State.traceFilter==='all'?'active':''}" data-filter="all">All</button>
+            <button class="trace-filter ${State.traceFilter==='agent'?'active':''}" data-filter="agent">Agents</button>
+            <button class="trace-filter ${State.traceFilter==='tool'?'active':''}" data-filter="tool">Tools</button>
+            <button class="trace-filter ${State.traceFilter==='approval'?'active':''}" data-filter="approval">Approvals</button>
+            <button class="trace-filter ${State.traceFilter==='system'?'active':''}" data-filter="system">System</button>
+          </div>
+          <div class="trace-list">
+            ${renderTrace()}
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="section-header">
+          <div class="section-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Pending Approvals
+            ${pendingApprovals > 0 ? `<span style="background:var(--orange);color:#fff;font-size:10px;padding:1px 7px;border-radius:10px;margin-left:6px;font-weight:700">${pendingApprovals}</span>` : ''}
+          </div>
+        </div>
+        ${pendingApprovals > 0
+          ? backend.approvals.filter(a=>a.executionState==='PENDING').map(a => renderApprovalCard(a)).join('')
+          : '<div class="empty-state" style="padding:24px"><p>No pending approvals</p></div>'}
+      </div>
+    </div>
+
+    ${(m.executionState === 'VERIFYING' || m.executionState === 'COMPLETED') ? `
+    <div class="section fade-in">
+      <div class="section-header">
+        <div class="section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          Verification Gates
+          <span class="sl sl-fix">FIXTURE</span>
+        </div>
+      </div>
+      <div class="verification-grid">
+        ${['BUILD','TYPECHECK','UNIT TESTS','INTEGRATION TESTS','SECURITY','ACCESSIBILITY','PERFORMANCE','ACCEPTANCE CRITERIA'].map(g => `
+          <div class="v-gate">
+            <div class="v-gate-icon ${m.executionState==='COMPLETED'?'pass':'pending'}">
+              ${m.executionState==='COMPLETED'
+                ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>'
+                : '<div class="loading-spinner" style="width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin 0.8s linear infinite"></div>'}
+            </div>
+            <span class="v-gate-name">${g}</span>
+            <span class="v-gate-status" style="color:${m.executionState==='COMPLETED'?'var(--green)':'var(--text-muted)'}">${m.executionState==='COMPLETED'?'PASS':'RUNNING'}</span>
+          </div>
+        `).join('')}
+      </div>
+      ${m.executionState === 'COMPLETED' ? `
+        <div style="margin-top:12px;padding:14px;background:var(--green-dim);border-radius:var(--radius);text-align:center;border:1px solid rgba(34,197,94,0.2)">
+          <span style="font-weight:800;color:var(--green);font-size:14px;letter-spacing:0.02em">✓ MISSION VERIFIED</span>
+          <span style="font-size:11px;color:var(--text-dim);display:block;margin-top:4px">Independent verification — fixture gates. In production, gates run against real evidence with hash verification.</span>
+        </div>
+      ` : ''}
+    </div>` : ''}
+
+    ${m.executionState === 'COMPLETED' && backend.artifacts.filter(a => a.missionId === m.id).length > 0 ? `
+    <div class="section fade-in">
+      <div class="section-header">
+        <div class="section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+          Artifacts
+        </div>
+        <span class="section-action" onclick="switchView('artifacts')">View all ›</span>
+      </div>
+      <div class="artifact-grid">
+        ${backend.artifacts.filter(a => a.missionId === m.id).map(art => `
+          <div class="artifact-card" onclick="showArtifactDetail('${art.id}')">
+            <div class="artifact-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <div class="artifact-name">${art.name}</div>
+            <div class="artifact-meta">${art.type} · ${art.version} · ${art.createdBy}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>` : ''}
+
+    <div class="section fade-in">
+      <div class="section-header">
+        <div class="section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          Cost Inspector
+          <span class="sl sl-fix">FIXTURE PRICING</span>
+        </div>
+      </div>
+      <div class="cost-breakdown">
+        <div class="cost-total">$${totalCost.toFixed(2)}</div>
+        <div class="cost-total-label">EST. TOTAL · Actual cost: <span class="sl sl-unknown">UNKNOWN</span> until provider reports usage</div>
+        <div class="cost-bar"><div class="cost-bar-fill" style="width:${Math.min(100,(totalCost/m.budget)*100)}%"></div></div>
+        <div class="cost-items">
+          ${backend.agents.map(a => `
+            <div class="cost-item">
+              <div class="cost-item-name">
+                <div class="cost-item-dot" style="background:${a.color}"></div>
+                ${a.name}
+              </div>
+              <div class="cost-item-value">$${a.cost.toFixed(3)}</div>
+            </div>
+          `).join('')}
+        </div>
+        <div class="inspector-note">Fixture pricing — not billed. In production, actual cost is UNKNOWN until the provider reports usage. <span class="sl sl-fix">FIXTURE</span></div>
+      </div>
+    </div>
+
+    <div class="section fade-in" style="display:flex;gap:8px;flex-wrap:wrap">
+      ${m.executionState !== 'COMPLETED' && m.executionState !== 'CANCELLED' ? `
+        <button class="btn btn-ghost" onclick="pauseMission()">⏸ Pause</button>
+        <button class="btn btn-ghost" onclick="stopMission()">⏹ Stop</button>
+      ` : ''}
+      <button class="btn btn-ghost" onclick="showComposer()">+ New Mission</button>
+      <button class="btn btn-ghost" onclick="resetDemo()">↺ Reset Demo</button>
+    </div>
+  `;
+}
+
+function renderDAG(tasks) {
+  const positions = {
+    t1: {x:300, y:30}, t2: {x:140, y:110}, t3: {x:460, y:110},
+    t4: {x:240, y:190}, t5: {x:460, y:190},
+    t6: {x:350, y:250}, t7: {x:560, y:250}, t8: {x:450, y:310},
+  };
+  const edges = [
+    {from:'t1',to:'t2'},{from:'t1',to:'t3'},
+    {from:'t3',to:'t4'},{from:'t3',to:'t5'},
+    {from:'t4',to:'t6'},{from:'t5',to:'t6'},
+    {from:'t4',to:'t7'},{from:'t6',to:'t8'},{from:'t7',to:'t8'},
+  ];
+
+  let svg = `<svg class="dag-svg" viewBox="0 0 700 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Task dependency graph">`;
+
+  edges.forEach(e => {
+    const from = positions[e.from];
+    const to = positions[e.to];
+    const fromTask = tasks.find(t=>t.id===e.from);
+    const isDone = fromTask && fromTask.executionState === 'SUCCEEDED';
+    const isActive = fromTask && fromTask.executionState === 'RUNNING';
+    svg += `<line class="dag-edge ${isDone?'done':isActive?'active':''}" x1="${from.x}" y1="${from.y+22}" x2="${to.x}" y2="${to.y-22}"/>`;
+  });
+
+  tasks.forEach(t => {
+    const pos = positions[t.id];
+    if (!pos) return;
+    const cls = t.executionState.toLowerCase();
+    const agent = backend.agents.find(a=>a.id===t.agent);
+    const color = agent ? agent.color : 'var(--text-dim)';
+
+    svg += `<g class="dag-node" onclick="selectTask('${t.id}')" tabindex="0" role="button" aria-label="Task ${t.name}, status ${t.executionState}">`;
+    svg += `<rect class="dag-node-rect ${cls}" x="${pos.x-72}" y="${pos.y-22}" width="144" height="44" rx="8"/>`;
+    svg += `<text class="dag-node-label" x="${pos.x}" y="${pos.y-2}" text-anchor="middle">${esc(t.name)}</text>`;
+    svg += `<text class="dag-node-sub" x="${pos.x}" y="${pos.y+12}" text-anchor="middle" fill="${color}">${t.agent || 'unassigned'}</text>`;
+    svg += `</g>`;
+  });
+
+  svg += `</svg>`;
+  svg += `<div style="display:flex;gap:16px;margin-top:12px;font-size:10px;color:var(--text-dim);flex-wrap:wrap">`;
+  svg += `<span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:50%;background:var(--green)"></span> Completed</span>`;
+  svg += `<span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:50%;background:var(--blue)"></span> Running</span>`;
+  svg += `<span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:50%;background:var(--amber)"></span> Waiting</span>`;
+  svg += `<span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:50%;background:var(--red)"></span> Blocked</span>`;
+  svg += `<span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:50%;background:var(--border)"></span> Pending</span>`;
+  svg += `</div>`;
+  return svg;
+}
+
+function renderAgentCard(a) {
+  const statusColors = {RUNNING:'var(--blue)',IDLE:'var(--text-muted)',COMPLETED:'var(--green)',SPAWNED:'var(--purple)'};
+  const statusLabels = {RUNNING:'Running',IDLE:'Idle',COMPLETED:'Completed',SPAWNED:'Spawned'};
+  const isSelected = State.selectedAgent === a.id;
+
+  return `
+    <div class="agent-card ${isSelected?'selected':''}" onclick="selectAgent('${a.id}')" tabindex="0" role="button" aria-label="Agent ${a.name}, status ${a.status}">
+      <div class="agent-icon" style="background:${a.color}20;color:${a.color}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"/><path d="M12 6v6l4 2"/></svg>
+      </div>
+      <div class="agent-info">
+        <div class="agent-name">${a.name}</div>
+        <div class="agent-role">${a.role}</div>
+      </div>
+      <div class="agent-status">
+        <span class="dot" style="background:${statusColors[a.status]||'var(--text-muted)'}"></span>
+        ${statusLabels[a.status]||a.status}
+      </div>
+      <div class="agent-progress">
+        <div class="agent-progress-bar">
+          <div class="agent-progress-fill" style="width:${a.progress}%;background:${a.color}"></div>
+        </div>
+        <div class="agent-pct" style="color:${a.color}">${a.progress}%</div>
+      </div>
+    </div>
+  `;
+}
+
+function renderApprovalCard(a) {
+  return `
+    <div class="approval-card fade-in">
+      <span class="approval-risk risk-${a.risk.toLowerCase()}">${a.risk} RISK</span>
+      <div class="approval-title">${esc(a.title)}</div>
+      ${a.destination ? `<div class="approval-detail">Destination: <span class="mono">${a.destination}</span></div>` : ''}
+      ${a.method ? `<div class="approval-detail">Method: <span class="mono">${a.method}</span></div>` : ''}
+      ${a.scope ? `<div class="approval-detail">Scope: ${a.scope}</div>` : ''}
+      ${a.branch ? `<div class="approval-detail">Branch: <span class="mono">${a.branch}</span> · Files: ${a.files} · Tests: ${a.tests}</div>` : ''}
+      ${a.agent ? `<div class="approval-detail">Agent: <span class="mono">${a.agent}</span> · Task: <span class="mono">${a.task}</span></div>` : ''}
+      ${a.policyRule ? `<div class="approval-detail">Policy: <span class="mono">${a.policyRule}</span></div>` : ''}
+      <div class="approval-actions">
+        <button class="btn btn-danger btn-sm" onclick="handleApproval('${a.id}','reject')">Reject</button>
+        <button class="btn btn-primary btn-sm" onclick="handleApproval('${a.id}','approve')">Approve</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderTrace() {
+  const events = backend.events.filter(e => e.missionId === State.currentMission?.id);
+  const filtered = State.traceFilter === 'all' ? events : events.filter(e => {
+    if (State.traceFilter === 'agent') return e.type.includes('TASK');
+    if (State.traceFilter === 'tool') return e.type === 'TOOL_CALLED';
+    if (State.traceFilter === 'approval') return e.type.includes('APPROVAL');
+    if (State.traceFilter === 'system') return e.actor === 'System';
+    return true;
+  });
+
+  if (filtered.length === 0) {
+    return '<div class="empty-state" style="padding:24px"><p>No events yet. Start a mission to see the activity trace.</p></div>';
+  }
+
+  return filtered.slice().reverse().map(e => `
+    <div class="trace-item">
+      <span class="trace-seq">#${e.sequence}</span>
+      <span class="trace-time">${formatTime(e.timestamp)}</span>
+      <span class="trace-actor">${e.actor}</span>
+      <span class="trace-event"><span class="mono">${e.type}</span> — ${esc(e.detail)}</span>
+      <span class="trace-tag sl sl-${e.truthState==='SIMULATED'?'sim':e.truthState==='LIVE_PROVIDER'?'live':'fix'}">${e.truthState}</span>
+    </div>
+  `).join('');
+}
+
+function renderMissionsView() {
+  return `
+    <div class="main-header fade-in">
+      <h1 class="mission-title">Swarms</h1>
+      <p style="color:var(--text-dim);font-size:13px;margin-top:4px">All missions in this workspace</p>
+    </div>
+    <div class="section fade-in">
+      ${State.currentMission ? `
+        <div class="agent-card" onclick="switchView('command')" style="cursor:pointer">
+          <div class="agent-icon" style="background:var(--orange)20;color:var(--orange)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <div class="agent-info">
+            <div class="agent-name">${esc(State.currentMission.goal)}</div>
+            <div class="agent-role">Run ID: ${State.currentMission.runId} · ${State.currentMission.mode} mode</div>
+          </div>
+          <span class="mission-status status-${State.currentMission.executionState.toLowerCase()}">${State.currentMission.executionState.replace('_',' ')}</span>
+        </div>
+      ` : '<div class="empty-state"><p>No missions yet</p></div>'}
+    </div>
+    <button class="btn btn-primary" onclick="showComposer()" style="margin-top:12px">+ New Mission</button>
+  `;
+}
+
+function renderTasksView() {
+  const tasks = backend.tasks.filter(t => t.missionId === State.currentMission?.id);
+  return `
+    <div class="main-header fade-in">
+      <h1 class="mission-title">Tasks</h1>
+      <p style="color:var(--text-dim);font-size:13px;margin-top:4px">${tasks.filter(t=>t.executionState==='SUCCEEDED').length}/${tasks.length} completed</p>
+    </div>
+    <div class="section fade-in">
+      ${tasks.map(t => {
+        const statusColors = {PENDING:'var(--border)',RUNNING:'var(--blue)',SUCCEEDED:'var(--green)',BLOCKED:'var(--red)',WAITING_APPROVAL:'var(--purple)'};
+        const agent = backend.agents.find(a=>a.id===t.agent);
+        return `
+          <div class="agent-card" onclick="selectTask('${t.id}')" style="cursor:pointer">
+            <div class="agent-icon" style="background:${agent?agent.color:'var(--border)'}20;color:${agent?agent.color:'var(--text-dim)'}">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            </div>
+            <div class="agent-info">
+              <div class="agent-name">${esc(t.name)}</div>
+              <div class="agent-role">${t.type} · ${t.agent || 'Unassigned'} · ${t.deps.length} deps</div>
+            </div>
+            <div class="agent-progress" style="width:100px">
+              <div class="agent-progress-bar"><div class="agent-progress-fill" style="width:${t.progress}%;background:${statusColors[t.executionState]||'var(--border)'}"></div></div>
+              <div class="agent-pct" style="color:${statusColors[t.executionState]||'var(--text-dim)'}">${t.executionState.replace('_',' ')} · ${t.progress}%</div>
+            </div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
+}
+
+function renderAgentsView() {
+  return `
+    <div class="main-header fade-in">
+      <h1 class="mission-title">Agents</h1>
+      <p style="color:var(--text-dim);font-size:13px;margin-top:4px">${backend.agents.filter(a=>a.status==='RUNNING').length} running · ${backend.agents.filter(a=>a.status==='IDLE').length} idle</p>
+    </div>
+    <div class="section fade-in">
+      <div class="agent-list">
+        ${backend.agents.map(a => renderAgentCard(a)).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function renderApprovalsView() {
+  const pending = backend.approvals.filter(a => a.executionState === 'PENDING');
+  const decided = backend.approvals.filter(a => a.executionState !== 'PENDING');
+  return `
+    <div class="main-header fade-in">
+      <h1 class="mission-title">Approvals</h1>
+      <p style="color:var(--text-dim);font-size:13px;margin-top:4px">${pending.length} pending · ${decided.length} decided</p>
+    </div>
+    <div class="section fade-in">
+      <div class="tab-bar">
+        <div class="tab active">Pending (${pending.length})</div>
+        <div class="tab">Decided (${decided.length})</div>
+      </div>
+      ${pending.length > 0 ? pending.map(a => renderApprovalCard(a)).join('') : '<div class="empty-state"><p>No pending approvals</p></div>'}
+    </div>
+  `;
+}
+
+function renderEvidenceView() {
+  return `
+    <div class="main-header fade-in">
+      <h1 class="mission-title">Evidence Ledger</h1>
+      <p style="color:var(--text-dim);font-size:13px;margin-top:4px">${backend.evidence.length} items · <span class="sl sl-fix">FIXTURE</span></p>
+    </div>
+    <div class="section fade-in">
+      ${backend.evidence.length > 0 ? backend.evidence.map(e => `
+        <div class="evidence-card" onclick="showEvidenceDetail('${e.id}')">
+          <div class="evidence-source">${e.sourceType} · ${e.source}</div>
+          <div class="evidence-claim">"${esc(e.claim)}"</div>
+          <div class="evidence-meta">
+            <span>Trust: ${e.trust}</span>
+            <span class="confidence-${(e.confidence||0) > 0.7 ? 'high' : 'low'}">Confidence: ${Math.round((e.confidence||0)*100)}%</span>
+            <span>Supporting: ${e.supporting?.length || 0}</span>
+            ${e.contradicting?.length ? `<span style="color:var(--red)">Contradicting: ${e.contradicting.length}</span>` : ''}
+          </div>
+        </div>
+      `).join('') : '<div class="empty-state"><h3>No evidence yet</h3><p>Evidence is collected as agents execute tasks.</p></div>'}
+    </div>
+  `;
+}
+
+function renderArtifactsView() {
+  const artifacts = backend.artifacts.filter(a => a.missionId === State.currentMission?.id);
+  return `
+    <div class="main-header fade-in">
+      <h1 class="mission-title">Artifacts</h1>
+      <p style="color:var(--text-dim);font-size:13px;margin-top:4px">${artifacts.length} artifacts · <span class="sl sl-fix">FIXTURE</span></p>
+    </div>
+    <div class="section fade-in">
+      ${artifacts.length > 0 ? `
+        <div class="artifact-grid">
+          ${artifacts.map(art => `
+            <div class="artifact-card" onclick="showArtifactDetail('${art.id}')">
+              <div class="artifact-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              </div>
+              <div class="artifact-name">${art.name}</div>
+              <div class="artifact-meta">${art.type} · ${art.version}</div>
+              <div class="artifact-meta" style="margin-top:4px">by ${art.createdBy} · ${formatBytes(art.size||0)}</div>
+            </div>
+          `).join('')}
+        </div>
+      ` : '<div class="empty-state"><h3>No artifacts yet</h3><p>Artifacts appear as tasks complete.</p></div>'}
+    </div>
+  `;
+}
+
+function renderCostsView() {
+  const totalCost = backend.agents.reduce((s, a) => s + a.cost, 0);
+  const totalTokens = backend.agents.reduce((s, a) => s + a.tokenIn + a.tokenOut, 0);
+  return `
+    <div class="main-header fade-in">
+      <h1 class="mission-title">Cost Inspector</h1>
+      <p style="color:var(--text-dim);font-size:13px;margin-top:4px"><span class="sl sl-fix">FIXTURE PRICING — NOT BILLED</span></p>
+    </div>
+    <div class="section fade-in">
+      <div class="cost-breakdown">
+        <div class="cost-total">$${totalCost.toFixed(3)}</div>
+        <div class="cost-total-label">ESTIMATED TOTAL · Actual cost: <span class="sl sl-unknown">UNKNOWN</span> until provider reports</div>
+        <div class="cost-bar"><div class="cost-bar-fill" style="width:${Math.min(100,(totalCost/5)*100)}%"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-dim);margin-bottom:16px">
+          <span>Budget: $5.00</span>
+          <span>Remaining: $${(5 - totalCost).toFixed(2)}</span>
+        </div>
+        <div class="cost-items">
+          ${backend.agents.map(a => `
+            <div class="cost-item">
+              <div class="cost-item-name">
+                <div class="cost-item-dot" style="background:${a.color}"></div>
+                ${a.name}
+              </div>
+              <div class="cost-item-value">$${a.cost.toFixed(3)}</div>
+            </div>
+          `).join('')}
+        </div>
+        <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border-subtle)">
+          <div class="inspector-row"><span class="label">Total Tokens</span><span class="value">${totalTokens.toLocaleString()}</span></div>
+          <div class="inspector-row"><span class="label">Input Tokens</span><span class="value">${backend.agents.reduce((s,a)=>s+a.tokenIn,0).toLocaleString()}</span></div>
+          <div class="inspector-row"><span class="label">Output Tokens</span><span class="value">${backend.agents.reduce((s,a)=>s+a.tokenOut,0).toLocaleString()}</span></div>
+          <div class="inspector-row"><span class="label">Tool Calls</span><span class="value">${backend.events.filter(e=>e.type==='TOOL_CALLED').length}</span></div>
+        </div>
+        <div class="inspector-note">Fixture pricing — not billed. In production, actual cost is UNKNOWN until the provider reports usage. <span class="sl sl-fix">FIXTURE</span></div>
+      </div>
+    </div>
+  `;
+}
+
+function renderModelsView() {
+  return `
+    <div class="main-header fade-in">
+      <h1 class="mission-title">Model Fabric</h1>
+      <p style="color:var(--text-dim);font-size:13px;margin-top:4px">Provider-agnostic model routing</p>
+    </div>
+    <div class="section fade-in">
+      <div class="agent-list">
+        ${backend.models.map(m => `
+          <div class="agent-card" style="cursor:default">
+            <div class="agent-icon" style="background:var(--bg-elev2);color:var(--text-dim)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            </div>
+            <div class="agent-info">
+              <div class="agent-name">${m.name} <span class="sl sl-${m.truthState==='LIVE_PROVIDER'?'live':m.truthState==='LIVE_LOCAL'?'live':'fix'}" style="margin-left:6px">${m.truthState}</span></div>
+              <div class="agent-role">${m.provider} · Context: ${m.capabilities.contextWindow.toLocaleString()} · Cost: ${m.costTier} · Latency: ${m.latency}</div>
+            </div>
+            <div style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono)">
+              ${m.capabilities.toolCalling ? '✓ tools' : ''} ${m.capabilities.mcp ? '✓ mcp' : ''} ${m.capabilities.local ? '✓ local' : ''}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+      <div class="inspector-note" style="margin-top:16px">Model routing policies: AUTO · QUALITY · SPEED · COST · PRIVACY · LOCAL · BALANCED. In production, routing is capability-based, not brand-based. Restricted data never routes to free-tier providers.</div>
+    </div>
+  `;
+}
+
+function renderPolicyView() {
+  return `
+    <div class="main-header fade-in">
+      <h1 class="mission-title">Policy Engine</h1>
+      <p style="color:var(--text-dim);font-size:13px;margin-top:4px">ALLOW · ASK · DENY rule evaluation</p>
+    </div>
+    <div class="section fade-in">
+      <div style="margin-bottom:16px;padding:12px;background:var(--bg-elev2);border-radius:var(--radius-lg);border:1px solid var(--border-subtle)">
+        <div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:8px;letter-spacing:0.06em;text-transform:uppercase">Evaluation Logic</div>
+        <div style="font-size:12px;font-family:var(--font-mono);line-height:1.6;color:var(--text-dim)">
+          <div>for each tool_invocation:</div>
+          <div style="padding-left:16px">pattern = match(invocation.tool, policy.pattern)</div>
+          <div style="padding-left:16px">if pattern matches:</div>
+          <div style="padding-left:32px">if policy.decision == ALLOW → execute</div>
+          <div style="padding-left:32px">if policy.decision == ASK → create approval</div>
+          <div style="padding-left:32px">if policy.decision == DENY → reject with reason</div>
+        </div>
+      </div>
+      <div class="policy-list">
+        ${POLICY_RULES.map(r => `
+          <div class="policy-rule">
+            <span class="policy-pattern">${r.pattern}</span>
+            <span class="policy-decision policy-${r.decision.toLowerCase()}">${r.decision}</span>
+            <span style="font-size:10px;color:var(--text-muted);max-width:200px">${r.reason}</span>
+          </div>
+        `).join('')}
+      </div>
+      <div class="inspector-note" style="margin-top:16px">Policy rules are evaluated before every tool invocation. In production, policies are tenant-scoped and auditable. <span class="sl sl-sim">SIMULATED</span></div>
+    </div>
+  `;
+}
+
+function renderMemoryView() {
+  return `
+    <div class="main-header fade-in">
+      <h1 class="mission-title">Memory</h1>
+      <p style="color:var(--text-dim);font-size:13px;margin-top:4px">${backend.memories.length} items · <span class="sl sl-fix">FIXTURE</span></p>
+    </div>
+    <div class="section fade-in">
+      <div class="memory-list">
+        ${backend.memories.map(m => `
+          <div class="memory-item">
+            <span class="mem-cat">${m.cat}</span>
+            <span class="mem-text">${esc(m.text)}</span>
+            <button class="btn btn-ghost btn-sm" onclick="deleteMemory('${m.id}')" style="padding:4px 8px;font-size:10px" aria-label="Delete memory">✕</button>
+          </div>
+        `).join('')}
+      </div>
+      <div style="margin-top:16px">
+        <div style="font-size:11px;font-weight:700;margin-bottom:8px;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted)">Add Memory</div>
+        <div style="display:flex;gap:8px">
+          <select id="memCat" style="padding:8px;background:var(--bg-elev2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:12px">
+            <option>User</option><option>Project</option><option>Mission</option><option>Organization</option>
+          </select>
+          <input id="memText" placeholder="Add a memory..." style="flex:1;padding:8px;background:var(--bg-elev2);border:1px solid var(--border);border-radius:var(--radius);font-size:12px">
+          <button class="btn btn-primary btn-sm" onclick="addMemory()">Add</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderSkillsView() {
+  return `
+    <div class="main-header fade-in">
+      <h1 class="mission-title">Skills</h1>
+      <p style="color:var(--text-dim);font-size:13px;margin-top:4px">Reusable verified workflows · <span class="sl sl-fix">FIXTURE</span></p>
+    </div>
+    <div class="section fade-in">
+      <div class="skill-grid">
+        ${backend.skills.map(s => `
+          <div class="skill-card">
+            <div class="skill-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </div>
+            <div class="skill-name">${s.name}</div>
+            <div class="skill-desc">${s.description}</div>
+            <div style="font-size:11px;color:var(--text-dim);margin:8px 0">Success: ${s.success}</div>
+            <div style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono)">
+              v${s.version} · ${s.steps} steps · Last: ${s.lastUsed}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function renderMCPView() {
+  return `
+    <div class="main-header fade-in">
+      <h1 class="mission-title">MCP / Tools</h1>
+      <p style="color:var(--text-dim);font-size:13px;margin-top:4px">Model Context Protocol connectors</p>
+    </div>
+    <div class="section fade-in">
+      ${backend.mcpServers.map(s => {
+        const statusClass = s.status === 'CONNECTED' ? 'sl-live' : s.status === 'UNAVAILABLE' ? 'sl-unavail' : 'sl-unknown';
+        return `
+          <div class="agent-card" style="cursor:default">
+            <div class="agent-icon" style="background:var(--bg-elev2);color:var(--text-dim)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            </div>
+            <div class="agent-info">
+              <div class="agent-name">${s.name} <span class="sl ${statusClass}" style="margin-left:6px">${s.status}</span></div>
+              <div class="agent-role">Transport: ${s.transport} · Tools: ${s.tools.join(', ')}</div>
+            </div>
+          </div>
+        `;
+      }).join('')}
+      <div class="inspector-note" style="margin-top:16px">MCP servers show as UNAVAILABLE until a real transport adapter is configured. Never expose every MCP capability automatically — limit to the smallest useful tool surface.</div>
+    </div>
+  `;
+}
+
+function renderCapabilitiesView() {
+  return `
+    <div class="main-header fade-in">
+      <h1 class="mission-title">Capability Registry</h1>
+      <p style="color:var(--text-dim);font-size:13px;margin-top:4px">Runtime capabilities mapped to website claims</p>
+    </div>
+    <div class="section fade-in">
+      <div class="cap-grid">
+        ${CAPABILITY_REGISTRY.map(c => {
+          const statusClass = c.status === 'LIVE' ? 'sl-live' : c.status === 'SIMULATED' ? 'sl-sim' : 'sl-unavail';
+          return `
+            <div class="cap-card">
+              <div class="cap-name">${c.name}</div>
+              <div class="cap-status"><span class="sl ${statusClass}">${c.status}</span> <span style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono)">v${c.version}</span></div>
+              <div class="cap-meta">${c.lastVerified ? 'Verified: ' + c.lastVerified : 'Not verified'}</div>
+              <div style="font-size:10px;color:var(--text-dim);margin-top:6px;line-height:1.4">${c.evidence}</div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+      <div class="inspector-note" style="margin-top:16px">The capability registry ensures website claims map to actual runtime capabilities. If a capability is UNAVAILABLE, the website must not claim it as LIVE.</div>
+    </div>
+  `;
+}
+
+function updateInspector() {
+  const el = document.getElementById('inspectorContent');
+  if (State.selectedAgent) {
+    const a = backend.agents.find(ag => ag.id === State.selectedAgent);
+    if (a) {
+      el.innerHTML = `
+        <div class="inspector-section">
+          <div class="inspector-section-title">Agent</div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+            <div class="agent-icon" style="background:${a.color}20;color:${a.color};width:40px;height:40px">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"/><path d="M12 6v6l4 2"/></svg>
+            </div>
+            <div>
+              <div style="font-weight:800;font-size:14px">${a.name}</div>
+              <div style="font-size:11px;color:var(--text-dim)">${a.role}</div>
+            </div>
+          </div>
+        </div>
+        <div class="inspector-section">
+          <div class="inspector-section-title">Status</div>
+          <div class="inspector-row"><span class="label">Status</span><span class="value" style="color:${a.status==='RUNNING'?'var(--blue)':a.status==='COMPLETED'?'var(--green)':'var(--text-dim)'}">${a.status}</span></div>
+          <div class="inspector-row"><span class="label">Current Task</span><span class="value">${a.currentTask || '—'}</span></div>
+          <div class="inspector-row"><span class="label">Progress</span><span class="value">${a.progress}%</span></div>
+        </div>
+        <div class="inspector-section">
+          <div class="inspector-section-title">Runtime</div>
+          <div class="inspector-row"><span class="label">Model</span><span class="value">${a.model} <span class="sl sl-fix" style="font-size:8px">FIXTURE</span></span></div>
+          <div class="inspector-row"><span class="label">Sandbox</span><span class="value">${a.sandbox}</span></div>
+          <div class="inspector-row"><span class="label">Tools</span><span class="value">${a.tools.join(', ')}</span></div>
+          <div class="inspector-row"><span class="label">Capabilities</span><span class="value">${a.capabilities.join(', ')}</span></div>
+          <div class="inspector-row"><span class="label">Network</span><span class="value">restricted</span></div>
+          <div class="inspector-row"><span class="label">Secrets</span><span class="value">0</span></div>
+        </div>
+        <div class="inspector-section">
+          <div class="inspector-section-title">Telemetry</div>
+          <div class="inspector-row"><span class="label">Cost</span><span class="value">$${a.cost.toFixed(3)} est.</span></div>
+          <div class="inspector-row"><span class="label">Tokens In</span><span class="value">${a.tokenIn.toLocaleString()}</span></div>
+          <div class="inspector-row"><span class="label">Tokens Out</span><span class="value">${a.tokenOut.toLocaleString()}</span></div>
+        </div>
+        <div class="inspector-note">Telemetry shown in this demo is simulated. In production, telemetry comes from persisted model_invocations. <span class="sl sl-sim">SIMULATED</span></div>
+      `;
+      return;
+    }
+  }
+  if (State.selectedTask) {
+    const t = backend.tasks.find(tk => tk.id === State.selectedTask);
+    if (t) {
+      const agent = backend.agents.find(a=>a.id===t.agent);
+      el.innerHTML = `
+        <div class="inspector-section">
+          <div class="inspector-section-title">Task</div>
+          <div style="font-weight:800;font-size:14px;margin-bottom:4px">${esc(t.name)}</div>
+          <div style="font-size:11px;color:var(--text-dim);font-family:var(--font-mono)">ID: ${t.id} · Type: ${t.type}</div>
+        </div>
+        <div class="inspector-section">
+          <div class="inspector-section-title">Status</div>
+          <div class="inspector-row"><span class="label">State</span><span class="value">${t.executionState}</span></div>
+          <div class="inspector-row"><span class="label">Progress</span><span class="value">${t.progress}%</span></div>
+          <div class="inspector-row"><span class="label">Agent</span><span class="value">${t.agent||'—'}</span></div>
+          <div class="inspector-row"><span class="label">Dependencies</span><span class="value">${t.deps.length > 0 ? t.deps.join(', ') : 'none'}</span></div>
+        </div>
+        <div class="inspector-section">
+          <div class="inspector-section-title">Tool Calls</div>
+          ${backend.events.filter(e=>e.type==='TOOL_CALLED' && e.actor === agent?.name).slice(-5).map(e => `
+            <div class="tool-card">
+              <div class="tool-card-header">
+                <span class="tool-card-name">${e.type}</span>
+                <span class="tool-card-status" style="color:var(--green)">COMPLETED</span>
+              </div>
+              <div class="tool-card-io">${esc(e.detail)}</div>
+            </div>
+          `).join('') || '<div style="font-size:11px;color:var(--text-muted)">No tool calls yet</div>'}
+        </div>
+      `;
+      return;
+    }
+  }
+  el.innerHTML = `
+    <div class="empty-state">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+      <h3>Select an item</h3>
+      <p>Click an agent, task, or event to inspect details</p>
+    </div>
+  `;
+}
+
+function selectAgent(id) { State.selectedAgent = id; State.selectedTask = null; render(); }
+function selectTask(id) { State.selectedTask = id; State.selectedAgent = null; render(); }
+
+function switchView(view) {
+  State.currentView = view;
+  document.querySelectorAll('.sidebar-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.view === view);
+  });
+  render();
+}
+
+function showComposer() {
+  document.getElementById('composerOverlay').style.display = 'flex';
+  document.getElementById('composerInput').focus();
+}
+function hideComposer() { document.getElementById('composerOverlay').style.display = 'none'; }
+
+async function startMissionFromComposer() {
+  const goal = document.getElementById('composerInput').value.trim();
+  if (!goal) { notify('Please enter a goal', 'error'); return; }
+  hideComposer();
+  State.currentView = 'command';
+  await createMission(goal);
+}
+
+async function deleteMemory(id) { await backend.deleteMemory(id); render(); }
+async function addMemory() {
+  const cat = document.getElementById('memCat').value;
+  const text = document.getElementById('memText').value.trim();
+  if (!text) return;
+  await backend.addMemory({cat, text});
+  document.getElementById('memText').value = '';
+  render();
+}
+
+function showArtifactDetail(id) {
+  const art = backend.artifacts.find(a => a.id === id);
+  if (!art) return;
+  openBottomSheet(`
+    <h3 style="font-size:16px;font-weight:800;margin-bottom:4px">${art.name}</h3>
+    <div style="font-size:12px;color:var(--text-dim);margin-bottom:16px">${art.type} · ${art.version} · <span class="sl sl-fix">FIXTURE</span></div>
+    <div class="inspector-row"><span class="label">Created by</span><span class="value">${art.createdBy}</span></div>
+    <div class="inspector-row"><span class="label">Task</span><span class="value">${art.task}</span></div>
+    <div class="inspector-row"><span class="label">MIME</span><span class="value">${art.mimeType||'unknown'}</span></div>
+    <div class="inspector-row"><span class="label">Size</span><span class="value">${formatBytes(art.size||0)}</span></div>
+    <div class="inspector-row"><span class="label">SHA-256</span><span class="value" style="font-size:9px">${art.sha256}</span></div>
+    <div class="inspector-note">Artifact preview not available in demo. In production, artifacts are stored in MinIO with SHA-256 verification. <span class="sl sl-fix">FIXTURE</span></div>
+  `);
+}
+
+function showEvidenceDetail(id) {
+  const e = backend.evidence.find(ev => ev.id === id);
+  if (!e) return;
+  openBottomSheet(`
+    <div class="evidence-source" style="font-size:12px;margin-bottom:8px">${e.sourceType} · ${e.source}</div>
+    <h3 style="font-size:15px;font-weight:800;margin-bottom:12px">"${esc(e.claim)}"</h3>
+    <div class="inspector-row"><span class="label">Source Ref</span><span class="value" style="font-size:10px">${e.sourceRef||'—'}</span></div>
+    <div class="inspector-row"><span class="label">Trust</span><span class="value">${e.trust}</span></div>
+    <div class="inspector-row"><span class="label">Confidence</span><span class="value confidence-${(e.confidence||0) > 0.7 ? 'high' : 'low'}">${Math.round((e.confidence||0)*100)}%</span></div>
+    <div class="inspector-row"><span class="label">Supporting</span><span class="value">${e.supporting?.join(', ')||'none'}</span></div>
+    <div class="inspector-row"><span class="label">Contradicting</span><span class="value" style="color:${e.contradicting?.length?'var(--red)':'var(--text-dim)'}">${e.contradicting?.join(', ')||'none'}</span></div>
+    <div class="inspector-note">Evidence is fixture data for demo purposes. In production, evidence is collected from real tool calls and web sources with HTTP(S)-only validation.</div>
+  `);
+}
+
+function showNotification(msg, type) {
+  const el = document.getElementById('notification');
+  el.textContent = msg;
+  el.className = 'notification show ' + (type||'info');
+  setTimeout(() => { el.className = 'notification'; }, 3200);
+}
+const notify = showNotification;
+
+function openBottomSheet(content) {
+  document.getElementById('sheetContent').innerHTML = content;
+  document.getElementById('sheetOverlay').style.display = 'block';
+  setTimeout(() => { document.getElementById('bottomSheet').classList.add('open'); }, 10);
+}
+function closeBottomSheet() {
+  document.getElementById('bottomSheet').classList.remove('open');
+  setTimeout(() => { document.getElementById('sheetOverlay').style.display = 'none'; }, 300);
+}
+
+function updateCounts() {
+  const pending = backend.approvals.filter(a => a.executionState === 'PENDING').length;
+  document.getElementById('approvalCount').textContent = pending;
+  const badge = document.getElementById('notifBadge');
+  badge.textContent = pending;
+  badge.style.display = pending > 0 ? 'flex' : 'none';
+  document.getElementById('swarmCount').textContent = backend.missions.length;
+  document.getElementById('agentCount').textContent = backend.agents.length;
+}
+
+function attachViewHandlers() {
+  document.querySelectorAll('.trace-filter').forEach(btn => {
+    btn.onclick = () => { State.traceFilter = btn.dataset.filter; render(); };
+  });
+}
+
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function formatTime(iso) { return new Date(iso).toTimeString().substr(0,8); }
+function timeAgo(iso) {
+  const diff = Date.now() - new Date(iso).getTime();
+  const mins = Math.floor(diff/60000);
+  if (mins < 1) return 'just now';
+  if (mins < 60) return mins + 'm ago';
+  const hrs = Math.floor(mins/60);
+  if (hrs < 24) return hrs + 'h ago';
+  return Math.floor(hrs/24) + 'd ago';
+}
+function formatBytes(b) {
+  if (b < 1024) return b + ' B';
+  if (b < 1024*1024) return (b/1024).toFixed(1) + ' KB';
+  return (b/1024/1024).toFixed(1) + ' MB';
+}
+function delay(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+
+// ─── Public ↔ App switching ───
+function switchToApp(openComposer = false) {
+  document.getElementById('publicSite').style.display = 'none';
+  document.getElementById('appSite').style.display = 'block';
+  window.scrollTo(0, 0);
+  if (openComposer) setTimeout(() => showComposer(), 100);
+  else if (!State.currentMission) setTimeout(() => showComposer(), 100);
+}
+function switchToPublic() {
+  document.getElementById('appSite').style.display = 'none';
+  document.getElementById('publicSite').style.display = 'block';
+  window.scrollTo(0, 0);
+}
+
+// ─── Event Listeners ─
+function setupEventListeners() {
+  document.getElementById('composerStart').addEventListener('click', startMissionFromComposer);
+  document.getElementById('composerCancel').addEventListener('click', hideComposer);
+  document.getElementById('composerOverlay').addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) hideComposer();
+  });
+
+  document.querySelectorAll('.composer-mode').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.composer-mode').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      State.missionMode = btn.dataset.mode;
+    });
+  });
+
+  document.querySelectorAll('.composer-quick-item').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.getElementById('composerInput').value = btn.dataset.goal;
+    });
+  });
+
+  document.querySelectorAll('.sidebar-item').forEach(item => {
+    item.addEventListener('click', () => switchView(item.dataset.view));
+    item.addEventListener('keydown', (e) => { if(e.key==='Enter') switchView(item.dataset.view); });
+  });
+
+  document.querySelectorAll('.mobile-nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+      document.querySelectorAll('.mobile-nav-item').forEach(i => i.classList.remove('active'));
+      item.classList.add('active');
+      const view = item.dataset.mview;
+      if (view === 'home') switchView('command');
+      else if (view === 'swarms') switchView('missions');
+      else if (view === 'agents') switchView('agents');
+      else if (view === 'new') showComposer();
+      else if (view === 'more') openBottomSheet(`
+        <h3 style="font-size:15px;font-weight:800;margin-bottom:14px">More</h3>
+        <div class="agent-list">
+          ${['approvals','evidence','artifacts','costs','models','policy','memory','skills','mcp','capabilities'].map(v =>
+            `<div class="agent-card" onclick="closeBottomSheet();switchView('${v}')" style="cursor:pointer"><div class="agent-info"><div class="agent-name" style="text-transform:capitalize">${v.replace('mcp','MCP / Tools')}</div></div></div>`
+          ).join('')}
+        </div>
+      `);
+    });
+  });
+
+  document.getElementById('sheetOverlay').addEventListener('click', closeBottomSheet);
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      e.preventDefault();
+      openCommandPalette();
+    }
+    if (e.key === 'Escape') {
+      hideComposer();
+      closeBottomSheet();
+      closeCommandPalette();
+    }
+  });
+
+  document.getElementById('notifBtn').addEventListener('click', () => switchView('approvals'));
+}
+
+// ── Command Palette ───
+const COMMANDS = [
+  {id:'new-mission',label:'New Mission',shortcut:'⌘N',action:()=>showComposer()},
+  {id:'pause',label:'Pause Mission',action:()=>pauseMission()},
+  {id:'stop',label:'Stop Mission',action:()=>stopMission()},
+  {id:'approvals',label:'Open Approvals',action:()=>switchView('approvals')},
+  {id:'approve-next',label:'Approve Next Action',action:()=>{const p=backend.approvals.find(a=>a.executionState==='PENDING');if(p)handleApproval(p.id,'approve');}},
+  {id:'reject-next',label:'Reject Next Action',action:()=>{const p=backend.approvals.find(a=>a.executionState==='PENDING');if(p)handleApproval(p.id,'reject');}},
+  {id:'task-graph',label:'Open Task Graph',action:()=>switchView('command')},
+  {id:'task-list',label:'Open Task List',action:()=>switchView('tasks')},
+  {id:'activity',label:'Open Activity Trace',action:()=>switchView('command')},
+  {id:'evidence',label:'Open Evidence',action:()=>switchView('evidence')},
+  {id:'artifacts',label:'Open Artifacts',action:()=>switchView('artifacts')},
+  {id:'agent-inspector',label:'Open Agent Inspector',action:()=>switchView('agents')},
+  {id:'cost-inspector',label:'Open Cost Inspector',action:()=>switchView('costs')},
+  {id:'models',label:'Open Model Fabric',action:()=>switchView('models')},
+  {id:'policy',label:'Open Policy Engine',action:()=>switchView('policy')},
+  {id:'memory',label:'Open Memory',action:()=>switchView('memory')},
+  {id:'skills',label:'Open Skills',action:()=>switchView('skills')},
+  {id:'mcp',label:'Open MCP / Tools',action:()=>switchView('mcp')},
+  {id:'capabilities',label:'Open Capability Registry',action:()=>switchView('capabilities')},
+  {id:'reset',label:'Reset Demo',action:()=>resetDemo()},
+  {id:'website',label:'Back to Website',action:()=>switchToPublic()},
+];
+
+let cmdFocusedIndex = 0;
+function openCommandPalette() {
+  document.getElementById('cmdOverlay').style.display = 'flex';
+  document.getElementById('cmdInput').value = '';
+  document.getElementById('cmdInput').focus();
+  cmdFocusedIndex = 0;
+  renderCommands('');
+}
+function closeCommandPalette() { document.getElementById('cmdOverlay').style.display = 'none'; }
+
+function renderCommands(query) {
+  const filtered = COMMANDS.filter(c => c.label.toLowerCase().includes(query.toLowerCase()));
+  const list = document.getElementById('cmdList');
+  list.innerHTML = filtered.map((c,i) => `
+    <div class="cmd-item ${i===cmdFocusedIndex?'focused':''}" data-idx="${i}" onclick="executeCommand(${COMMANDS.indexOf(c)})" role="option">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      ${c.label}
+      ${c.shortcut ? `<span class="cmd-shortcut">${c.shortcut}</span>` : ''}
+    </div>
+  `).join('') || '<div class="empty-state" style="padding:20px"><p>No commands found</p></div>';
+}
+
+function executeCommand(idx) {
+  if (COMMANDS[idx]) { COMMANDS[idx].action(); closeCommandPalette(); }
+}
+
+document.getElementById('cmdInput').addEventListener('input', (e) => { cmdFocusedIndex = 0; renderCommands(e.target.value); });
+document.getElementById('cmdInput').addEventListener('keydown', (e) => {
+  const items = document.querySelectorAll('.cmd-item');
+  if (e.key === 'ArrowDown') { e.preventDefault(); cmdFocusedIndex = Math.min(cmdFocusedIndex+1, items.length-1); renderCommands(document.getElementById('cmdInput').value); }
+  if (e.key === 'ArrowUp') { e.preventDefault(); cmdFocusedIndex = Math.max(cmdFocusedIndex-1, 0); renderCommands(document.getElementById('cmdInput').value); }
+  if (e.key === 'Enter') { e.preventDefault(); const filtered = COMMANDS.filter(c => c.label.toLowerCase().includes(document.getElementById('cmdInput').value.toLowerCase())); if (filtered[cmdFocusedIndex]) { const idx = COMMANDS.indexOf(filtered[cmdFocusedIndex]); executeCommand(idx); } }
+});
+document.getElementById('cmdOverlay').addEventListener('click', (e) => { if (e.target === e.currentTarget) closeCommandPalette(); });
+
+// ─ Init ───
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
+```

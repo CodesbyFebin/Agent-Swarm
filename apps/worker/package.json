@@ -1,0 +1,14 @@
+{
+  "name": "@agentswarm/worker",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch --env-file=../../.env src/index.js",
+    "start": "node --env-file=../../.env src/index.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.6.1",
+    "pg": "^8.16.3",
+    "zod": "^4.1.5"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "name": "agentswarm",
+  "private": true,
+  "version": "0.2.0",
+  "type": "module",
+  "workspaces": ["apps/*"],
+  "scripts": {
+    "dev": "concurrently -n api,worker,web -c auto \"npm run dev -w @agentswarm/api\" \"npm run dev -w @agentswarm/worker\" \"npm run dev -w @agentswarm/web\"",
+    "dev:api": "npm run dev -w @agentswarm/api",
+    "dev:worker": "npm run dev -w @agentswarm/worker",
+    "dev:web": "npm run dev -w @agentswarm/web",
+    "migrate": "node scripts/migrate.mjs",
+    "build": "npm run build -w @agentswarm/web",
+    "start:api": "npm run start -w @agentswarm/api",
+    "start:worker": "npm run start -w @agentswarm/worker"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
