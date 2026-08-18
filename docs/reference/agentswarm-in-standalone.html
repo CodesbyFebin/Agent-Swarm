@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0f">
+<meta name="color-scheme" content="dark">
+<meta name="description" content="AgentSwarm.in — Sovereign, local-LLM-first agentic engineering for AI coding agents, MCP-native tooling, controlled execution and verification.">
+<meta name="keywords" content="AI coding agents, MCP, Model Context Protocol, agentic engineering, local LLM, sovereign AI, agent verification, coding agent security">
+<meta name="author" content="AgentSwarm.in Editorial Team">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="googlebot" content="index, follow">
+<link rel="canonical" href="https://agentswarm.in/">
+<link rel="alternate" hreflang="en" href="https://agentswarm.in/">
+<link rel="alternate" hreflang="x-default" href="https://agentswarm.in/">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FF5A1F' stroke-width='2.5'%3E%3Cpath d='M12 2L2 7l10 5 10-5-10-5z'/%3E%3Cpath d='M2 17l10 5 10-5'/%3E%3Cpath d='M2 12l10 5 10-5'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23FF5A1F'%3E%3Cpath d='M12 2L2 7l10 5 10-5-10-5z'/%3E%3Cpath d='M2 17l10 5 10-5'/%3E%3Cpath d='M2 12l10 5 10-5'/%3E%3C/svg%3E">
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22AgentSwarm.in%22%2C%22short_name%22%3A%22AgentSwarm%22%2C%22start_url%22%3A%22%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230a0a0f%22%2C%22theme_color%22%3A%22%23FF5A1F%22%7D">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AgentSwarm.in">
+<meta property="og:title" content="AgentSwarm.in — Sovereign AI Coding Agents, MCP & Local LLM Development">
+<meta property="og:description" content="Sovereign, local-LLM-first agentic engineering for AI coding agents, MCP-native tooling, controlled execution and verification.">
+<meta property="og:url" content="https://agentswarm.in/">
+<meta property="og:locale" content="en_IN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AgentSwarm.in — Sovereign AI Coding Agents, MCP & Local LLM Development">
+<meta name="twitter:description" content="Sovereign, local-LLM-first agentic engineering for AI coding agents, MCP-native tooling, controlled execution and verification.">
+<title>AgentSwarm.in — Sovereign AI Coding Agents, MCP & Local LLM Development</title>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://agentswarm.in/#organization",
+      "name": "AgentSwarm.in",
+      "url": "https://agentswarm.in/",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://agentswarm.in/assets/logo.png"
+      },
+      "description": "Sovereign, local-LLM-first agentic engineering for AI coding agents, MCP-native tooling, controlled execution and verification."
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://agentswarm.in/#website",
+      "url": "https://agentswarm.in/",
+      "name": "AgentSwarm.in",
+      "publisher": {
+        "@id": "https://agentswarm.in/#organization"
+      },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://agentswarm.in/search?q={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      }
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://app.agentswarm.in/#software",
+      "name": "AgentSwarm Command Center",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Web, iOS, Android",
+      "url": "https://app.agentswarm.in/"
+    }
+  ]
+}
+</script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#06060a;--bg-elev:#0c0c14;--bg-elev2:#13131d;--bg-elev3:#1a1a26;--bg-elev4:#22222f;
+  --border:#24243a;--border-subtle:#18182a;--border-strong:#3a3a52;
+  --text:#e8e8f2;--text-dim:#8888a4;--text-muted:#545470;--text-faint:#3a3a52;
+  --orange:#FF5A1F;--orange-dim:#d14a18;--orange-bright:#ff7a3f;--orange-glow:rgba(255,90,31,0.12);--orange-glow-strong:rgba(255,90,31,0.3);
+  --green:#22c55e;--green-dim:rgba(34,197,94,0.12);
+  --blue:#3b82f6;--blue-dim:rgba(59,130,246,0.12);
+  --amber:#f59e0b;--amber-dim:rgba(245,158,11,0.12);
+  --purple:#a855f7;--purple-dim:rgba(168,85,247,0.12);
+  --red:#ef4444;--red-dim:rgba(239,68,68,0.12);
+  --teal:#14b8a6;--teal-dim:rgba(20,184,166,0.12);
+  --radius:6px;--radius-lg:10px;--radius-xl:14px;--radius-2xl:20px;
+  --font-sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  --font-mono:'JetBrains Mono','SF Mono','Fira Code',monospace;
+  --t:140ms cubic-bezier(.4,0,.2,1);--t-slow:280ms cubic-bezier(.4,0,.2,1);
+  --shadow-sm:0 1px 2px rgba(0,0,0,0.3);--shadow-md:0 4px 12px rgba(0,0,0,0.4);--shadow-lg:0 12px 32px rgba(0,0,0,0.5);--shadow-glow:0 0 40px rgba(255,90,31,0.2);
+  --max-w:1280px;--max-w-wide:1440px;
+}
+html{font-size:16px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;scroll-behavior:smooth}
+body{font-family:var(--font-sans);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;line-height:1.6}
+a{color:inherit;text-decoration:none;transition:color var(--t)}
+a:hover{color:var(--orange)}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;-webkit-tap-highlight-color:transparent}
+input,textarea,select{font-family:inherit;color:inherit}
+img,svg{max-width:100%;height:auto;display:block}
+ul,ol{list-style:none}
+:focus-visible{outline:2px solid var(--orange);outline-offset:2px;border-radius:2px}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important;scroll-behavior:auto!important}}
+
+/* ─── Skip Link ─── */
+.skip-link{position:absolute;top:-100%;left:16px;background:var(--orange);color:#fff;padding:12px 16px;border-radius:var(--radius);font-weight:600;z-index:1000}
+.skip-link:focus{top:16px}
+
+/* ─── State Labels ─── */
+.sl{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;font-family:var(--font-mono);letter-spacing:0.04em}
+.sl-live{background:var(--green-dim);color:var(--green)}.sl-live::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+.sl-sim{background:var(--purple-dim);color:var(--purple)}
+.sl-fix{background:var(--amber-dim);color:var(--amber)}
+.sl-unavail{background:var(--red-dim);color:var(--red)}
+.sl-unknown{background:var(--border);color:var(--text-dim)}
+.sl-degraded{background:var(--amber-dim);color:var(--amber)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+
+/* ─── Buttons ─── */
+.btn{padding:10px 20px;border-radius:var(--radius);font-size:14px;font-weight:600;transition:var(--t);display:inline-flex;align-items:center;gap:8px;white-space:nowrap;border:1px solid transparent}
+.btn-primary{background:var(--orange);color:#fff}.btn-primary:hover{background:var(--orange-dim);transform:translateY(-1px);box-shadow:var(--shadow-md)}
+.btn-ghost{background:transparent;color:var(--text-dim);border-color:var(--border)}.btn-ghost:hover{background:var(--bg-elev2);color:var(--text);border-color:var(--border-strong)}
+.btn-danger{background:var(--red-dim);color:var(--red);border-color:rgba(239,68,68,0.3)}.btn-danger:hover{background:rgba(239,68,68,0.2)}
+.btn-sm{padding:6px 12px;font-size:12px}.btn-lg{padding:14px 28px;font-size:15px}
+.btn:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+
+/* ─── Top Nav ─── */
+.top-nav{position:sticky;top:0;z-index:100;background:rgba(6,6,10,0.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--border-subtle)}
+.top-nav-inner{max-width:var(--max-w-wide);margin:0 auto;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.nav-brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:16px;letter-spacing:-0.02em}
+.nav-brand-icon{width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,var(--orange),var(--orange-bright));display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.nav-brand-icon svg{width:16px;height:16px;color:#fff}
+.nav-brand em{font-style:normal;color:var(--orange)}
+.nav-links{display:flex;gap:24px;font-size:14px;color:var(--text-dim)}
+.nav-links a:hover{color:var(--text)}
+.nav-right{display:flex;align-items:center;gap:12px}
+.nav-toggle{display:none;width:36px;height:36px;align-items:center;justify-content:center;border-radius:var(--radius);border:1px solid var(--border)}
+.nav-toggle svg{width:20px;height:20px}
+
+/* ─── Hero ─── */
+.hero{padding:100px 24px 80px;text-align:center;background:radial-gradient(ellipse at top,rgba(255,90,31,0.08) 0%,transparent 60%);border-bottom:1px solid var(--border-subtle);position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle at 1px 1px,var(--border-subtle) 1px,transparent 0);background-size:40px 40px;opacity:0.4;pointer-events:none}
+.hero-inner{max-width:900px;margin:0 auto;position:relative;z-index:1}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;background:var(--orange-glow);color:var(--orange);border:1px solid rgba(255,90,31,0.3);margin-bottom:24px}
+.hero-badge .pulse{width:6px;height:6px;border-radius:50%;background:var(--orange);animation:pulse 2s infinite}
+.hero h1{font-size:clamp(36px,6vw,64px);font-weight:800;letter-spacing:-0.03em;line-height:1.05;margin-bottom:20px}
+.hero h1 em{font-style:normal;color:var(--orange)}
+.hero p{font-size:clamp(16px,1.8vw,20px);color:var(--text-dim);max-width:720px;margin:0 auto 36px;line-height:1.6}
+.hero-ctas{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.hero-trust{display:flex;gap:24px;justify-content:center;flex-wrap:wrap;margin-top:48px;font-size:13px;color:var(--text-muted);font-weight:500}
+.hero-trust span{display:flex;align-items:center;gap:6px}
+.hero-trust svg{width:14px;height:14px;color:var(--orange)}
+
+/* ─── Sections ─── */
+.section{padding:80px 24px;border-bottom:1px solid var(--border-subtle)}
+.section-inner{max-width:var(--max-w);margin:0 auto}
+.section-header{text-align:center;max-width:720px;margin:0 auto 56px}
+.section-label{display:inline-block;font-size:12px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:12px}
+.section-title{font-size:clamp(28px,4vw,44px);font-weight:800;letter-spacing:-0.02em;margin-bottom:16px}
+.section-title em{font-style:normal;color:var(--orange)}
+.section-desc{font-size:17px;color:var(--text-dim);line-height:1.6}
+
+/* ─── Feature Grid ─── */
+.feature-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+.feature-card{background:var(--bg-elev);border:1px solid var(--border-subtle);border-radius:var(--radius-xl);padding:28px;transition:var(--t)}
+.feature-card:hover{border-color:var(--border-strong);transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.feature-icon{width:44px;height:44px;border-radius:var(--radius-lg);background:var(--orange-glow);color:var(--orange);display:flex;align-items:center;justify-content:center;margin-bottom:18px}
+.feature-icon svg{width:22px;height:22px}
+.feature-card h3{font-size:17px;font-weight:700;margin-bottom:10px}
+.feature-card p{font-size:14px;color:var(--text-dim);line-height:1.6}
+
+/* ─── Lifecycle ─── */
+.lifecycle-flow{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;padding:20px 0}
+.lifecycle-step{background:var(--bg-elev);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:12px 18px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;transition:var(--t)}
+.lifecycle-step:hover{border-color:var(--orange);color:var(--orange)}
+.lifecycle-step .num{width:24px;height:24px;border-radius:50%;background:var(--orange);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}
+
+/* ─── Use Case Grid ─── */
+.use-case-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+.use-case-chip{background:var(--bg-elev);border:1px solid var(--border-subtle);border-radius:var(--radius);padding:14px 16px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:10px;transition:var(--t)}
+.use-case-chip:hover{border-color:var(--orange);color:var(--orange)}
+.use-case-chip svg{width:16px;height:16px;color:var(--orange)}
+
+/* ─── Topic Clusters ─── */
+.cluster-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+.cluster-card{background:var(--bg-elev);border:1px solid var(--border-subtle);border-radius:var(--radius-xl);padding:24px;transition:var(--t)}
+.cluster-card:hover{border-color:var(--border-strong);transform:translateY(-2px)}
+.cluster-card .cluster-label{font-size:10px;font-weight:700;color:var(--orange);font-family:var(--font-mono);letter-spacing:0.05em;margin-bottom:8px}
+.cluster-card h3{font-size:16px;font-weight:700;margin-bottom:8px}
+.cluster-card p{font-size:13px;color:var(--text-dim);line-height:1.5;margin-bottom:12px}
+.cluster-links{display:flex;flex-wrap:wrap;gap:6px}
+.cluster-link{font-size:11px;color:var(--text-muted);padding:4px 10px;background:var(--bg-elev2);border-radius:20px;transition:var(--t)}
+.cluster-link:hover{color:var(--orange);background:var(--orange-glow)}
+
+/* ─── Knowledge Graph ─── */
+.kg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.kg-item{background:var(--bg-elev);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:18px;transition:var(--t)}
+.kg-item:hover{border-color:var(--border-strong)}
+.kg-item .kg-tag{font-size:10px;font-weight:700;color:var(--orange);font-family:var(--font-mono);margin-bottom:6px}
+.kg-item h4{font-size:14px;font-weight:700;margin-bottom:6px}
+.kg-item p{font-size:12px;color:var(--text-dim);line-height:1.5;margin-bottom:10px}
+.kg-item a{font-size:12px;color:var(--orange);font-weight:600}
+
+/* ─── FAQ ─── */
+.faq-list{max-width:800px;margin:0 auto}
+.faq-item{background:var(--bg-elev);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);margin-bottom:12px;overflow:hidden;transition:var(--t)}
+.faq-item:hover{border-color:var(--border-strong)}
+.faq-question{width:100%;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;font-size:15px;font-weight:600;text-align:left;cursor:pointer;transition:var(--t)}
+.faq-question:hover{color:var(--orange)}
+.faq-icon{width:24px;height:24px;border-radius:50%;background:var(--bg-elev2);display:flex;align-items:center;justify-content:center;transition:var(--t);flex-shrink:0}
+.faq-item.open .faq-icon{transform:rotate(45deg);background:var(--orange-glow);color:var(--orange)}
+.faq-answer{max-height:0;overflow:hidden;transition:max-height 0.3s ease}
+.faq-item.open .faq-answer{max-height:500px}
+.faq-answer-inner{padding:0 24px 20px;font-size:14px;color:var(--text-dim);line-height:1.7}
+
+/* ─── CTA Section ─── */
+.cta-section{padding:100px 24px;text-align:center;background:radial-gradient(ellipse at center,rgba(255,90,31,0.08) 0%,transparent 70%);border-top:1px solid var(--border-subtle);border-bottom:1px solid var(--border-subtle)}
+.cta-inner{max-width:700px;margin:0 auto}
+.cta-section h2{font-size:clamp(28px,4vw,44px);font-weight:800;letter-spacing:-0.02em;margin-bottom:16px}
+.cta-section p{font-size:17px;color:var(--text-dim);margin-bottom:36px;line-height:1.6}
+.cta-ctas{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+
+/* ─── Footer ─── */
+.footer{padding:60px 24px 30px;border-top:1px solid var(--border-subtle);background:var(--bg-elev)}
+.footer-inner{max-width:var(--max-w);margin:0 auto}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:40px}
+.footer-brand{max-width:320px}
+.footer-brand p{font-size:13px;color:var(--text-dim);line-height:1.6;margin-top:12px}
+.footer-col h5{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:14px}
+.footer-col ul{display:flex;flex-direction:column;gap:10px}
+.footer-col a{font-size:13px;color:var(--text-dim)}
+.footer-col a:hover{color:var(--text)}
+.footer-bottom{padding-top:24px;border-top:1px solid var(--border-subtle);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--text-muted)}
+
+/* ─── App View (Command Center) ─── */
+.app-view{display:none}
+.app-view.active{display:block}
+.public-view.hidden{display:none}
+
+.app-topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 18px;border-bottom:1px solid var(--border-subtle);background:var(--bg-elev);position:sticky;top:0;z-index:100}
+.app-topbar-left{display:flex;align-items:center;gap:12px}
+.app-topbar-logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:15px;letter-spacing:-0.02em}
+.app-topbar-logo em{font-style:normal;color:var(--orange)}
+.kbd-hint{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);padding:2px 6px;border:1px solid var(--border);border-radius:4px}
+.app-topbar-right{display:flex;align-items:center;gap:10px}
+.topbar-btn{width:34px;height:34px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;border:1px solid var(--border);color:var(--text-dim);transition:var(--t);position:relative}
+.topbar-btn:hover{background:var(--bg-elev2);color:var(--text)}
+.topbar-btn .badge{position:absolute;top:-4px;right:-4px;min-width:16px;height:16px;border-radius:8px;padding:0 4px;background:var(--orange);color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center}
+
+.app-layout{display:grid;grid-template-columns:220px 1fr 300px;min-height:calc(100vh - 49px)}
+@media(max-width:1280px){.app-layout{grid-template-columns:200px 1fr 280px}}
+@media(max-width:1024px){.app-layout{grid-template-columns:1fr}}
+
+.sidebar{border-right:1px solid var(--border-subtle);background:var(--bg-elev);padding:12px 0;overflow-y:auto}
+.sidebar-section{margin-bottom:10px}
+.sidebar-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);padding:8px 16px 4px}
+.sidebar-item{display:flex;align-items:center;gap:10px;padding:8px 16px;font-size:13px;color:var(--text-dim);cursor:pointer;transition:var(--t);border-left:2px solid transparent}
+.sidebar-item:hover{background:var(--bg-elev2);color:var(--text)}
+.sidebar-item.active{background:var(--orange-glow);color:var(--orange);border-left-color:var(--orange)}
+.sidebar-item svg{width:16px;height:16px;flex-shrink:0}
+.sidebar-item .count{margin-left:auto;font-size:10px;font-family:var(--font-mono);background:var(--bg-elev3);padding:1px 6px;border-radius:10px;font-weight:600}
+
+.main-content{overflow-y:auto;padding:22px}
+.main-header{margin-bottom:22px}
+.mission-title-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.mission-title{font-size:22px;font-weight:800;letter-spacing:-0.02em}
+.mission-status{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;font-family:var(--font-mono);letter-spacing:0.02em}
+.status-running{background:var(--blue-dim);color:var(--blue)}.status-running::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--blue);animation:pulse 1.5s infinite}
+.status-completed{background:var(--green-dim);color:var(--green)}.status-completed::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green)}
+.status-waiting{background:var(--amber-dim);color:var(--amber)}.status-waiting::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--amber)}
+.status-planning{background:var(--purple-dim);color:var(--purple)}.status-planning::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--purple);animation:pulse 1.5s infinite}
+.status-verifying{background:var(--teal-dim);color:var(--teal)}.status-verifying::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--teal);animation:pulse 1.5s infinite}
+.status-paused{background:var(--amber-dim);color:var(--amber)}
+.status-cancelled{background:var(--red-dim);color:var(--red)}
+.mission-meta{display:flex;align-items:center;gap:16px;margin-top:10px;font-size:12px;color:var(--text-dim);flex-wrap:wrap}
+.mission-meta .mono{color:var(--text-muted);font-family:var(--font-mono);font-size:11px}
+
+.truth-banner{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg-elev2);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);margin-bottom:16px;font-size:12px}
+.truth-banner .truth-icon{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.truth-banner .truth-icon.sim{background:var(--purple-dim);color:var(--purple)}
+
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
+@media(max-width:700px){.kpi-row{grid-template-columns:repeat(2,1fr)}}
+.kpi-card{background:var(--bg-elev);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:14px}
+.kpi-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:6px}
+.kpi-value{font-size:22px;font-weight:800;font-family:var(--font-mono);letter-spacing:-0.02em}
+.kpi-sub{font-size:11px;color:var(--text-dim);margin-top:3px}
+.kpi-sub.positive{color:var(--green)}
+.kpi-sub.unknown{color:var(--text-muted)}
+
+.section-app{margin-bottom:22px}
+.section-header-app{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.section-title-app{font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px}
+.section-title-app svg{width:16px;height:16px;color:var(--orange)}
+.section-action{font-size:12px;color:var(--orange);cursor:pointer;font-weight:600}
+.section-action:hover{text-decoration:underline}
+
+.dag-container{background:var(--bg-elev);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:18px;overflow-x:auto}
+.dag-svg{width:100%;min-width:600px;height:260px}
+.dag-node{cursor:pointer;transition:var(--t)}
+.dag-node:hover .dag-node-rect{stroke:var(--orange)!important;stroke-width:2}
+.dag-node-rect{rx:8;fill:var(--bg-elev2);stroke:var(--border);stroke-width:1.5;transition:var(--t)}
+.dag-node-rect.running{stroke:var(--blue);stroke-width:2;filter:drop-shadow(0 0 6px rgba(59,130,246,0.3))}
+.dag-node-rect.completed{stroke:var(--green);stroke-width:2}
+.dag-node-rect.waiting{stroke:var(--amber);stroke-width:2}
+.dag-node-rect.blocked{stroke:var(--red);stroke-width:2}
+.dag-node-rect.pending{stroke:var(--border);stroke-width:1.5}
+.dag-node-label{font-size:11px;font-weight:600;fill:var(--text)}
+.dag-node-sub{font-size:9px;fill:var(--text-dim)}
+.dag-edge{stroke:var(--border);stroke-width:1.5;fill:none}
+.dag-edge.active{stroke:var(--blue);stroke-width:2;stroke-dasharray:4 2;animation:dash-flow 1s linear infinite}
+.dag-edge.done{stroke:var(--green);stroke-width:2}
+@keyframes dash-flow{to{stroke-dashoffset:-6}}
+
+.agent-list{display:flex;flex-direction:column;gap:8px}
+.agent-card{display:flex;align-items:center;gap:12px;background:var(--bg-elev);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:12px 14px;cursor:pointer;transition:var(--t)}
+.agent-card:hover{border-color:var(--border-strong);background:var(--bg-elev2)}
+.agent-card.selected{border-color:var(--orange);background:var(--orange-glow)}
+.agent-icon{width:36px;height:36px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.agent-icon svg{width:18px;height:18px}
+.agent-info{flex:1;min-width:0}
+.agent-name{font-size:13px;font-weight:700}
+.agent-role{font-size:11px;color:var(--text-dim)}
+.agent-status{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;font-family:var(--font-mono)}
+.agent-status .dot{width:6px;height:6px;border-radius:50%}
+.agent-progress{width:80px;text-align:right}
+.agent-progress-bar{height:4px;background:var(--bg-elev3);border-radius:2px;overflow:hidden;margin-top:4px}
+.agent-progress-fill{height:100%;border-radius:2px;transition:width 0.5s ease}
+.agent-pct{font-size:11px;font-weight:700;font-family:var(--font-mono);margin-top:2px}
+
+.inspector{border-left:1px solid var(--border-subtle);background:var(--bg-elev);overflow-y:auto;padding:16px}
+.inspector-header{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:14px}
+.inspector-section{margin-bottom:16px}
+.inspector-section-title{font-size:10px;font-weight:700;color:var(--text-dim);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.06em}
+.inspector-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:12px}
+.inspector-row .label{color:var(--text-dim)}
+.inspector-row .value{font-family:var(--font-mono);font-size:11px;text-align:right;max-width:60%;word-break:break-all}
+.inspector-note{font-size:10px;color:var(--text-muted);padding:8px 10px;background:var(--bg-elev2);border-radius:var(--radius);border-left:2px solid var(--orange);margin-top:8px;line-height:1.5}
+
+.approval-card{background:var(--bg-elev);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:14px;margin-bottom:10px}
+.approval-risk{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;margin-bottom:8px;font-family:var(--font-mono);letter-spacing:0.05em}
+.risk-high{background:var(--red-dim);color:var(--red)}
+.risk-medium{background:var(--amber-dim);color:var(--amber)}
+.risk-low{background:var(--green-dim);color:var(--green)}
+.approval-title{font-size:13px;font-weight:700;margin-bottom:6px}
+.approval-detail{font-size:11px;color:var(--text-dim);margin-bottom:4px}
+.approval-detail .mono{font-family:var(--font-mono);font-size:10px}
+.approval-actions{display:flex;gap:8px;margin-top:10px}
+
+.trace-container{background:var(--bg-elev);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);overflow:hidden}
+.trace-filters{display:flex;gap:4px;padding:10px 12px;border-bottom:1px solid var(--border-subtle);flex-wrap:wrap}
+.trace-filter{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;background:var(--bg-elev2);color:var(--text-dim);cursor:pointer;transition:var(--t)}
+.trace-filter:hover{color:var(--text)}
+.trace-filter.active{background:var(--orange-glow);color:var(--orange)}
+.trace-list{max-height:320px;overflow-y:auto}
+.trace-item{display:flex;align-items:flex-start;gap:10px;padding:8px 12px;border-bottom:1px solid var(--border-subtle);font-size:12px;transition:var(--t)}
+.trace-item:hover{background:var(--bg-elev2)}
+.trace-time{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);width:62px;flex-shrink:0;padding-top:2px}
+.trace-seq{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);width:32px;flex-shrink:0;text-align:right}
+.trace-actor{font-weight:600;width:120px;flex-shrink:0;font-size:12px}
+.trace-event{color:var(--text-dim);flex:1}
+.trace-event .mono{font-family:var(--font-mono);font-size:11px}
+.trace-tag{font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;font-family:var(--font-mono);flex-shrink:0}
+
+.progress-bar{height:8px;background:var(--bg-elev3);border-radius:4px;overflow:hidden}
+.progress-fill{height:100%;border-radius:4px;transition:width 0.6s ease;background:linear-gradient(90deg,var(--orange),var(--purple))}
+
+.composer-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);display:none;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(10px);padding:20px}
+.composer-overlay.active{display:flex}
+.composer{background:var(--bg-elev);border:1px solid var(--border);border-radius:var(--radius-xl);padding:26px;width:100%;max-width:620px;max-height:85vh;overflow-y:auto;box-shadow:var(--shadow-lg)}
+.composer h2{font-size:24px;font-weight:800;margin-bottom:6px;letter-spacing:-0.02em}
+.composer h2 em{font-style:normal;color:var(--orange)}
+.composer-sub{font-size:13px;color:var(--text-dim);margin-bottom:20px;line-height:1.5}
+.composer-input{width:100%;padding:14px;background:var(--bg-elev2);border:1px solid var(--border);border-radius:var(--radius-lg);font-size:14px;color:var(--text);resize:none;min-height:90px;outline:none;transition:var(--t);line-height:1.5}
+.composer-input:focus{border-color:var(--orange);box-shadow:0 0 0 3px var(--orange-glow)}
+.composer-input::placeholder{color:var(--text-muted)}
+.composer-modes{display:flex;gap:6px;margin:16px 0;flex-wrap:wrap}
+.composer-mode{padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700;background:var(--bg-elev2);border:1px solid var(--border);color:var(--text-dim);cursor:pointer;transition:var(--t);font-family:var(--font-mono);letter-spacing:0.03em}
+.composer-mode:hover{color:var(--text);border-color:var(--border-strong)}
+.composer-mode.active{background:var(--orange);color:#fff;border-color:var(--orange)}
+.composer-quick{display:flex;flex-wrap:wrap;gap:6px;margin:16px 0}
+.composer-quick-item{padding:6px 12px;border-radius:20px;font-size:11px;background:var(--bg-elev2);border:1px solid var(--border-subtle);color:var(--text-dim);cursor:pointer;transition:var(--t)}
+.composer-quick-item:hover{border-color:var(--orange);color:var(--orange)}
+.composer-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+
+.cmd-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.65);display:none;align-items:flex-start;justify-content:center;padding-top:18vh;z-index:300;backdrop-filter:blur(4px)}
+.cmd-overlay.active{display:flex}
+.cmd-palette{background:var(--bg-elev);border:1px solid var(--border);border-radius:var(--radius-lg);width:95%;max-width:540px;overflow:hidden;box-shadow:var(--shadow-lg)}
+.cmd-input{width:100%;padding:14px 16px;background:transparent;border:none;border-bottom:1px solid var(--border-subtle);font-size:14px;color:var(--text);outline:none}
+.cmd-input::placeholder{color:var(--text-muted)}
+.cmd-list{max-height:340px;overflow-y:auto;padding:8px}
+.cmd-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius);cursor:pointer;transition:var(--t);font-size:13px}
+.cmd-item:hover,.cmd-item.focused{background:var(--bg-elev2)}
+.cmd-item svg{width:16px;height:16px;color:var(--text-dim);flex-shrink:0}
+.cmd-item .cmd-shortcut{margin-left:auto;font-family:var(--font-mono);font-size:10px;color:var(--text-muted)}
+
+.notification{position:fixed;top:60px;right:20px;z-index:400;background:var(--bg-elev);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px 16px;font-size:12px;box-shadow:var(--shadow-lg);transform:translateX(120%);transition:transform 0.3s cubic-bezier(.4,0,.2,1);max-width:320px;font-weight:500}
+.notification.show{transform:translateX(0)}
+.notification.success{border-left:3px solid var(--green)}
+.notification.error{border-left:3px solid var(--red)}
+.notification.info{border-left:3px solid var(--blue)}
+
+.empty-state{text-align:center;padding:40px 20px;color:var(--text-dim)}
+.empty-state svg{width:48px;height:48px;color:var(--text-muted);margin-bottom:12px}
+.empty-state h3{font-size:14px;font-weight:700;margin-bottom:4px;color:var(--text)}
+.empty-state p{font-size:12px}
+
+.tab-bar{display:flex;gap:4px;margin-bottom:16px;border-bottom:1px solid var(--border-subtle)}
+.tab{padding:8px 14px;font-size:12px;font-weight:600;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;transition:var(--t)}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--orange);border-bottom-color:var(--orange)}
+
+/* ─── Mobile Nav ─── */
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--bg-elev);border-top:1px solid var(--border);padding:6px 0 calc(6px + env(safe-area-inset-bottom));z-index:100}
+.mobile-nav-inner{display:flex;justify-content:space-around}
+.mobile-nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 10px;font-size:10px;color:var(--text-dim);cursor:pointer;transition:var(--t);font-weight:600}
+.mobile-nav-item.active{color:var(--orange)}
+.mobile-nav-item svg{width:20px;height:20px}
+.mobile-nav-item.center-btn{position:relative;top:-14px}
+.mobile-nav-item.center-btn .center-icon{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,var(--orange),var(--orange-bright));display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(255,90,31,0.4)}
+.mobile-nav-item.center-btn .center-icon svg{width:22px;height:22px;color:#fff}
+
+@media(max-width:1024px){
+  .sidebar,.inspector{display:none}
+  .app-layout{grid-template-columns:1fr}
+  .mobile-nav{display:block}
+  .main-content{padding-bottom:80px}
+  .nav-links{display:none}
+  .nav-toggle{display:flex}
+  .nav-links.open{display:flex;position:absolute;top:100%;left:0;right:0;flex-direction:column;background:var(--bg-elev);border-bottom:1px solid var(--border-subtle);padding:16px 24px;gap:16px}
+}
+@media(max-width:700px){
+  .hero{padding:60px 24px 50px}
+  .section{padding:60px 24px}
+  .footer-grid{grid-template-columns:1fr 1fr;gap:30px}
+  .feature-grid{grid-template-columns:1fr}
+  .cluster-grid{grid-template-columns:1fr}
+  .kg-grid{grid-template-columns:1fr}
+}
+
+/* ─── Animations ── */
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn 0.3s ease}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-spinner{width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin 0.8s linear infinite}
+</style>
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PUBLIC VIEW (agentswarm.in)
+     ═══════════════════════════════════════════════════════════ -->
+<div class="public-view" id="publicView">
+<nav class="top-nav" role="navigation" aria-label="Main navigation">
+  <div class="top-nav-inner">
+    <a href="#top" class="nav-brand" aria-label="AgentSwarm.in home">
+      <div class="nav-brand-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
+      Agent<em>Swarm</em>.in
+    </a>
+    <div class="nav-links" id="navLinks">
+      <a href="#platform">Platform</a>
+      <a href="#agents">Agents</a>
+      <a href="#mcp">MCP</a>
+      <a href="#local">Local LLMs</a>
+      <a href="#security">Security</a>
+      <a href="#knowledge">Learn</a>
+      <a href="#faq">FAQ</a>
+    </div>
+    <div class="nav-right">
+      <button class="btn btn-ghost" onclick="toggleView()">Open App </button>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<main id="main">
+<section class="hero" id="top">
+  <div class="hero-inner">
+    <div class="hero-badge"><span class="pulse"></span> SOVEREIGN · LOCAL-LLM-FIRST · MCP-NATIVE</div>
+    <h1>Engineering with <em>AI coding agents</em>, under your control.</h1>
+    <p>AgentSwarm.in is a sovereign, open-source, local-LLM-first agentic engineering project for planning, coding, debugging, review, security and verification across local and cloud model workflows.</p>
+    <div class="hero-ctas">
+      <button class="btn btn-primary btn-lg" onclick="toggleView()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Launch Command Center
+      </button>
+      <a href="#architecture" class="btn btn-ghost btn-lg">Explore architecture</a>
+    </div>
+    <div class="hero-trust">
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Controlled execution</span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/></svg> MCP-native</span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"/><path d="M12 6v6l4 2"/></svg> Local-first</span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Verification-first</span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Evidence-led</span>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="platform">
+  <div class="section-inner">
+    <div class="section-header">
+      <span class="section-label">Platform thesis</span>
+      <h2 class="section-title">Build agents like <em>production systems</em>, not chat windows.</h2>
+      <p class="section-desc">AgentSwarm.in treats an AI coding agent as a controlled engineering runtime: context, model policy, tools, workspaces, memory, permissions, evidence and independent verification are explicit components.</p>
+    </div>
+    <div class="feature-grid">
+      <article class="feature-card">
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
+        <h3>Portable agent core</h3>
+        <p>One architectural core designed to power IDE, CLI, desktop, web, mobile and CI surfaces without redefining execution semantics for every client.</p>
+      </article>
+      <article class="feature-card">
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+        <h3>Model fabric</h3>
+        <p>Route by coding capability, privacy, context, latency and operator policy instead of binding engineering workflows to a single model vendor.</p>
+      </article>
+      <article class="feature-card">
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div>
+        <h3>Tool governance</h3>
+        <p>Filesystem, shell, Git, browser, database and MCP actions belong behind explicit permission, sandbox, approval and audit boundaries.</p>
+      </article>
+      <article class="feature-card">
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+        <h3>Local-first execution</h3>
+        <p>Local models and local context are first-class design targets for private repositories, offline work and environments where external inference is not appropriate.</p>
+      </article>
+      <article class="feature-card">
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+        <h3>Evidence-led verification</h3>
+        <p>Builds, tests, security checks and artifact hashes should determine completion. A model saying "done" is not a verification result.</p>
+      </article>
+      <article class="feature-card">
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+        <h3>Reusable skills</h3>
+        <p>Turn successful, reviewed workflows into versioned skills with declared tools, inputs, policy requirements and verification criteria.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="architecture">
+  <div class="section-inner">
+    <div class="section-header">
+      <span class="section-label">Execution architecture</span>
+      <h2 class="section-title">Intent → evidence, with every <em>boundary visible</em>.</h2>
+      <p class="section-desc">The control loop separates planning from execution and execution from verification. This makes agent behavior easier to inspect, restrict, resume and improve.</p>
+    </div>
+    <div class="lifecycle-flow">
+      <div class="lifecycle-step"><span class="num">01</span>Understand</div>
+      <div class="lifecycle-step"><span class="num">02</span>Plan</div>
+      <div class="lifecycle-step"><span class="num">03</span>Route</div>
+      <div class="lifecycle-step"><span class="num">04</span>Execute</div>
+      <div class="lifecycle-step"><span class="num">05</span>Verify</div>
+      <div class="lifecycle-step"><span class="num">06</span>Learn</div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="agents">
+  <div class="section-inner">
+    <div class="section-header">
+      <span class="section-label">Specialized agents</span>
+      <h2 class="section-title">The right agent mode for the <em>engineering job</em>.</h2>
+      <p class="section-desc">Agent roles are composable behavior profiles—not fake employee theater. Each mode combines task intent, context strategy, tool scope, model policy and verification requirements.</p>
+    </div>
+    <div class="feature-grid">
+      <article class="feature-card"><div class="feature-icon" style="background:var(--purple-dim);color:var(--purple)"><span style="font-weight:800;font-size:18px">P</span></div><h3>Plan</h3><p>Decompose complex goals, map dependencies, surface uncertainty and define acceptance criteria before code changes begin.</p></article>
+      <article class="feature-card"><div class="feature-icon" style="background:var(--blue-dim);color:var(--blue)"><span style="font-weight:800;font-size:18px">C</span></div><h3>Code</h3><p>Implement scoped changes across files while preserving repository conventions and explicit tool boundaries.</p></article>
+      <article class="feature-card"><div class="feature-icon" style="background:var(--amber-dim);color:var(--amber)"><span style="font-weight:800;font-size:18px">D</span></div><h3>Debug</h3><p>Trace failures through logs, tests and code paths, then produce evidence-backed hypotheses and fixes.</p></article>
+      <article class="feature-card"><div class="feature-icon" style="background:var(--green-dim);color:var(--green)"><span style="font-weight:800;font-size:18px">R</span></div><h3>Review</h3><p>Evaluate diffs for correctness, maintainability, regressions and missing tests without self-certifying the authoring agent.</p></article>
+      <article class="feature-card"><div class="feature-icon" style="background:var(--red-dim);color:var(--red)"><span style="font-weight:800;font-size:18px">S</span></div><h3>Security</h3><p>Inspect trust boundaries, unsafe tool use, injection paths, secrets exposure and dependency risk.</p></article>
+      <article class="feature-card"><div class="feature-icon" style="background:var(--teal-dim);color:var(--teal)"><span style="font-weight:800;font-size:18px">A</span></div><h3>Ask</h3><p>Explore a codebase or architecture without changing it—useful for onboarding, design review and repository understanding.</p></article>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="mcp">
+  <div class="section-inner">
+    <div class="section-header">
+      <span class="section-label">Model Context Protocol</span>
+      <h2 class="section-title">MCP as a <em>governed capability layer</em>.</h2>
+      <p class="section-desc">AgentSwarm.in models both MCP client and server roles so agents can consume tools and expose reviewed capabilities without turning tool discovery into unrestricted execution authority.</p>
+    </div>
+    <div class="feature-grid">
+      <article class="feature-card"><h3>MCP client path</h3><p>Discover server → capabilities → filter by policy ∩ agent tools → authorize ALLOW / ASK / DENY → execute tool call → evidence.</p></article>
+      <article class="feature-card"><h3>MCP server path</h3><p>Export agent/skill capability → declare schema (typed inputs/outputs) → declare policy (permission + audit) → serve stdio / HTTP transport.</p></article>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="local">
+  <div class="section-inner">
+    <div class="section-header">
+      <span class="section-label">Local LLM first</span>
+      <h2 class="section-title">Keep sensitive engineering context <em>where it belongs</em>.</h2>
+      <p class="section-desc">Local inference is a first-class architecture target, alongside cloud providers. The model router can reason about privacy, hardware, context size and capability before choosing an execution path.</p>
+    </div>
+    <div class="feature-grid">
+      <article class="feature-card"><h3>Local runtime landscape</h3><p><strong>Ollama</strong> — developer-local inference · <strong>vLLM</strong> — self-hosted serving · <strong>llama.cpp</strong> — portable GGUF runtime · <strong>LM Studio</strong> — desktop model endpoint</p></article>
+      <article class="feature-card"><h3>Routing dimensions</h3><p><strong>Privacy</strong> — repository classification · <strong>VRAM</strong> — hardware-aware fit · <strong>Context</strong> — required token window · <strong>Quality</strong> — task evaluation history</p></article>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="security">
+  <div class="section-inner">
+    <div class="section-header">
+      <span class="section-label">Security and sovereignty</span>
+      <h2 class="section-title">Autonomy without <em>unbounded authority</em>.</h2>
+      <p class="section-desc">Agentic engineering is powerful precisely because agents can act. AgentSwarm.in therefore puts permissions, sandboxing, secrets, network access, approvals and verification into the architecture rather than treating them as post-launch hardening.</p>
+    </div>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;background:var(--bg-elev);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);overflow:hidden;font-size:14px">
+        <thead><tr style="background:var(--bg-elev2)"><th style="padding:14px;text-align:left;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted)">Capability</th><th style="padding:14px;text-align:left;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted)">Example action</th><th style="padding:14px;text-align:left;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted)">Default posture</th><th style="padding:14px;text-align:left;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted)">Why</th></tr></thead>
+        <tbody>
+          <tr style="border-top:1px solid var(--border-subtle)"><td style="padding:12px 14px">Repository read</td><td style="padding:12px 14px;font-family:var(--font-mono);font-size:12px">filesystem.read</td><td style="padding:12px 14px"><span class="sl sl-live">ALLOW</span></td><td style="padding:12px 14px;color:var(--text-dim)">Scoped read-only context</td></tr>
+          <tr style="border-top:1px solid var(--border-subtle)"><td style="padding:12px 14px">Workspace write</td><td style="padding:12px 14px;font-family:var(--font-mono);font-size:12px">filesystem.write</td><td style="padding:12px 14px"><span class="sl sl-live">ALLOW</span></td><td style="padding:12px 14px;color:var(--text-dim)">Within isolated task workspace</td></tr>
+          <tr style="border-top:1px solid var(--border-subtle)"><td style="padding:12px 14px">External network</td><td style="padding:12px 14px;font-family:var(--font-mono);font-size:12px">http.request</td><td style="padding:12px 14px"><span class="sl sl-fix">ASK</span></td><td style="padding:12px 14px;color:var(--text-dim)">Potential data egress</td></tr>
+          <tr style="border-top:1px solid var(--border-subtle)"><td style="padding:12px 14px">Git push</td><td style="padding:12px 14px;font-family:var(--font-mono);font-size:12px">git.push</td><td style="padding:12px 14px"><span class="sl sl-fix">ASK</span></td><td style="padding:12px 14px;color:var(--text-dim)">External side effect</td></tr>
+          <tr style="border-top:1px solid var(--border-subtle)"><td style="padding:12px 14px">Production deploy</td><td style="padding:12px 14px;font-family:var(--font-mono);font-size:12px">deploy.production</td><td style="padding:12px 14px"><span class="sl sl-fix">ASK</span></td><td style="padding:12px 14px;color:var(--text-dim)">High-impact environment change</td></tr>
+          <tr style="border-top:1px solid var(--border-subtle)"><td style="padding:12px 14px">Unknown destructive</td><td style="padding:12px 14px;font-family:var(--font-mono);font-size:12px">*</td><td style="padding:12px 14px"><span class="sl sl-unavail">DENY</span></td><td style="padding:12px 14px;color:var(--text-dim)">Deny-first consequential behavior</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="knowledge">
+  <div class="section-inner">
+    <div class="section-header">
+      <span class="section-label">SEO · AEO · GEO knowledge graph</span>
+      <h2 class="section-title">Learn AI coding agents as a <em>connected system</em>.</h2>
+      <p class="section-desc">The homepage organizes AgentSwarm.in around one primary entity—AI coding agents—with clear relationships to MCP, agentic engineering, local models, security, verification, memory, skills and enterprise development.</p>
+    </div>
+    <div class="cluster-grid">
+      <article class="cluster-card"><div class="cluster-label">AI CODING AGENTS</div><h3>What is an AI coding agent?</h3><p>Architecture, implementation boundaries, security, verification, and practical agentic engineering context.</p><div class="cluster-links"><a href="#" class="cluster-link">Explore concept →</a></div></article>
+      <article class="cluster-card"><div class="cluster-label">MCP</div><h3>What is Model Context Protocol?</h3><p>MCP server architecture, tools, security, permissions, and building an MCP-based agent platform.</p><div class="cluster-links"><a href="#" class="cluster-link">Explore concept →</a></div></article>
+      <article class="cluster-card"><div class="cluster-label">AGENTIC ENGINEERING</div><h3>Agentic engineering explained</h3><p>Plan-execute-verify loops, durable runtimes, state machines, task graphs, parallel subagents, human approval gates.</p><div class="cluster-links"><a href="#" class="cluster-link">Explore concept →</a></div></article>
+      <article class="cluster-card"><div class="cluster-label">LOCAL LLM CODING</div><h3>Local LLM coding overview</h3><p>Ollama, vLLM, llama.cpp, LM Studio, GGUF workflows, quantized models, VRAM-aware routing, offline embeddings.</p><div class="cluster-links"><a href="#" class="cluster-link">Explore concept →</a></div></article>
+      <article class="cluster-card"><div class="cluster-label">SECURITY</div><h3>AI coding agent security</h3><p>Prompt injection defenses, secure tool calling, agent sandboxing, network egress controls, secrets isolation.</p><div class="cluster-links"><a href="#" class="cluster-link">Explore concept →</a></div></article>
+      <article class="cluster-card"><div class="cluster-label">VERIFICATION</div><h3>Independent agent verification</h3><p>Build, typecheck, unit tests, browser, security, accessibility, performance, acceptance criteria verification.</p><div class="cluster-links"><a href="#" class="cluster-link">Explore concept →</a></div></article>
+      <article class="cluster-card"><div class="cluster-label">MEMORY & SKILLS</div><h3>Agent memory architecture</h3><p>Working, mission, workspace, knowledge memory. Agent skills, skill versioning, context compaction, memory privacy.</p><div class="cluster-links"><a href="#" class="cluster-link">Explore concept →</a></div></article>
+      <article class="cluster-card"><div class="cluster-label">DEVELOPER TOOLING</div><h3>Agent CLI design</h3><p>VS Code, JetBrains, desktop, mobile, CI coding agents. Git integrations, GitHub PR agents, terminal and filesystem tools.</p><div class="cluster-links"><a href="#" class="cluster-link">Explore concept →</a></div></article>
+      <article class="cluster-card"><div class="cluster-label">SOVEREIGN AI</div><h3>Sovereign AI development</h3><p>Local-first AI architecture, offline agent runtimes, private model routing, data residency, DPDP-aware systems.</p><div class="cluster-links"><a href="#" class="cluster-link">Explore concept →</a></div></article>
+      <article class="cluster-card"><div class="cluster-label">MODEL ROUTING</div><h3>Model routing for coding agents</h3><p>Quality, cost, latency, privacy, capability-based routing. Fallback strategy, model health checks, evaluation-driven selection.</p><div class="cluster-links"><a href="#" class="cluster-link">Explore concept →</a></div></article>
+      <article class="cluster-card"><div class="cluster-label">USE CASES</div><h3>Build a feature with AI agents</h3><p>Fix a production bug, review a pull request, refactor a monorepo, generate tests, audit security, modernize legacy code.</p><div class="cluster-links"><a href="#" class="cluster-link">Explore concept →</a></div></article>
+      <article class="cluster-card"><div class="cluster-label">ENTERPRISE</div><h3>Enterprise coding agents</h3><p>Organization policy, role-based access, audit-ready engineering, private deployment, cost and model governance.</p><div class="cluster-links"><a href="#" class="cluster-link">Explore concept →</a></div></article>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="faq">
+  <div class="section-inner">
+    <div class="section-header">
+      <span class="section-label">FAQ</span>
+      <h2 class="section-title">Direct answers about <em>AgentSwarm.in</em>.</h2>
+      <p class="section-desc">These answers are intentionally concise, visible on the page and aligned with the structured data in the document head.</p>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item"><button class="faq-question" aria-expanded="false"><span>What is AgentSwarm.in?</span><span class="faq-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></button><div class="faq-answer"><div class="faq-answer-inner">AgentSwarm.in is a sovereign, open-source, local-LLM-first agentic engineering project focused on AI coding agents, controlled tool use, MCP integrations, verification and practical developer workflows.</div></div></div>
+      <div class="faq-item"><button class="faq-question" aria-expanded="false"><span>What is an AI coding agent?</span><span class="faq-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></button><div class="faq-answer"><div class="faq-answer-inner">An AI coding agent is a software system that can plan and execute engineering tasks using a language model, repository context, tools, permissions, tests and controlled execution. Unlike autocomplete alone, an agent can work across multi-step tasks and produce artifacts for verification.</div></div></div>
+      <div class="faq-item"><button class="faq-question" aria-expanded="false"><span>Does AgentSwarm.in focus on local LLMs?</span><span class="faq-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></button><div class="faq-answer"><div class="faq-answer-inner">Yes. Local-LLM-first architecture is a core design direction. The routing model is intended to treat local runtimes as first-class targets for private repositories, offline work and hardware-aware inference.</div></div></div>
+      <div class="faq-item"><button class="faq-question" aria-expanded="false"><span>How does MCP fit into AgentSwarm.in?</span><span class="faq-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></button><div class="faq-answer"><div class="faq-answer-inner">Model Context Protocol is treated as a governed capability layer. Agents can discover tools, but effective access should be the intersection of available capabilities, agent scope, project policy and operator approval.</div></div></div>
+      <div class="faq-item"><button class="faq-question" aria-expanded="false"><span>How does AgentSwarm.in approach agent security?</span><span class="faq-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></button><div class="faq-answer"><div class="faq-answer-inner">The architecture emphasizes least privilege, isolated workspaces, secret scoping, network controls, approval gates, audit trails and independent verification rather than unrestricted autonomous tool use.</div></div></div>
+      <div class="faq-item"><button class="faq-question" aria-expanded="false"><span>Is every model or integration shown on this page live?</span><span class="faq-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></button><div class="faq-answer"><div class="faq-answer-inner">No. This homepage describes the platform architecture and product direction. It intentionally avoids fabricated live-status claims, unsupported model counts, customer numbers, ratings or benchmark results.</div></div></div>
+      <div class="faq-item"><button class="faq-question" aria-expanded="false"><span>Where is the application?</span><span class="faq-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></button><div class="faq-answer"><div class="faq-answer-inner">The application entry point is <a href="#" onclick="toggleView();return false" style="color:var(--orange)">app.agentswarm.in</a>. This public homepage is the product, architecture and knowledge authority surface.</div></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-section">
+  <div class="cta-inner">
+    <h2>Start from the <em>controlled path</em></h2>
+    <p>Build with agents. Keep engineering authority. Open the AgentSwarm application for agentic workflows, or inspect the public source and architecture before connecting models, tools and repositories.</p>
+    <div class="cta-ctas">
+      <button class="btn btn-primary btn-lg" onclick="toggleView()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Open app ↗
+      </button>
+      <a href="https://github.com/CodesbyFebin/Agent-Swarm" class="btn btn-ghost btn-lg" target="_blank" rel="noopener">GitHub source</a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="nav-brand"><div class="nav-brand-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>Agent<em>Swarm</em>.in</div>
+        <p>Sovereign, local-LLM-first agentic engineering for AI coding agents, MCP-native tooling, controlled execution and verification.</p>
+      </div>
+      <div class="footer-col"><h5>Platform</h5><ul><li><a href="#agents">AI Agents</a></li><li><a href="#mcp">MCP</a></li><li><a href="#local">Local LLMs</a></li><li><a href="#security">Security</a></li></ul></div>
+      <div class="footer-col"><h5>Knowledge</h5><ul><li><a href="#knowledge">AI coding agents</a></li><li><a href="#architecture">Agentic engineering</a></li><li><a href="#faq">FAQ</a></li></ul></div>
+      <div class="footer-col"><h5>Build</h5><ul><li><a href="#" onclick="toggleView();return false">Open app ↗</a></li><li><a href="https://github.com/CodesbyFebin/Agent-Swarm" target="_blank" rel="noopener">GitHub ↗</a></li><li><a href="#">Download AI context</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 AgentSwarm.in · Last reviewed 18 Aug 2026</span>
+      <span>Claims policy: unknown stays unknown · no fabricated metrics</span>
+    </div>
+  </div>
+</footer>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     APP VIEW (Command Center)
+     ═══════════════════════════════════════════════════════════ -->
+<div class="app-view" id="appView">
+<header class="app-topbar" role="banner">
+  <div class="app-topbar-left">
+    <div class="app-topbar-logo">
+      <div class="nav-brand-icon" style="width:26px;height:26px;border-radius:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:14px;height:14px"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
+      Agent<em>Swarm</em>
+    </div>
+    <span class="sl sl-sim">SIMULATED</span>
+    <button class="btn btn-ghost btn-sm" onclick="toggleView()">← Public site</button>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px">
+    <span class="kbd-hint">⌘K</span>
+    <span style="font-size:11px;color:var(--text-muted)">Commands</span>
+  </div>
+  <div class="app-topbar-right">
+    <button class="topbar-btn" aria-label="Notifications" id="notifBtn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span class="badge" id="notifBadge" style="display:none">0</span>
+    </button>
+  </div>
+</header>
+
+<div class="app-layout">
+  <nav class="sidebar" role="navigation" aria-label="App navigation">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Workspace</div>
+      <div class="sidebar-item active" data-view="command" tabindex="0" role="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Command Centre</div>
+      <div class="sidebar-item" data-view="missions" tabindex="0" role="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Swarms<span class="count" id="swarmCount">0</span></div>
+      <div class="sidebar-item" data-view="tasks" tabindex="0" role="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Tasks</div>
+      <div class="sidebar-item" data-view="agents" tabindex="0" role="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Agents<span class="count" id="agentCount">0</span></div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Observe</div>
+      <div class="sidebar-item" data-view="approvals" tabindex="0" role="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Approvals<span class="count" id="approvalCount">0</span></div>
+      <div class="sidebar-item" data-view="evidence" tabindex="0" role="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Evidence</div>
+      <div class="sidebar-item" data-view="artifacts" tabindex="0" role="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>Artifacts</div>
+      <div class="sidebar-item" data-view="costs" tabindex="0" role="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Costs</div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">System</div>
+      <div class="sidebar-item" data-view="models" tabindex="0" role="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Models</div>
+      <div class="sidebar-item" data-view="policy" tabindex="0" role="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Policy</div>
+      <div class="sidebar-item" data-view="memory" tabindex="0" role="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"/><path d="M12 6v6l4 2"/></svg>Memory</div>
+      <div class="sidebar-item" data-view="skills" tabindex="0" role="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Skills</div>
+      <div class="sidebar-item" data-view="mcp" tabindex="0" role="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>MCP / Tools</div>
+    </div>
+  </nav>
+
+  <main class="main-content" id="mainContent" role="main"></main>
+
+  <aside class="inspector" id="inspectorPanel" role="complementary" aria-label="Inspector">
+    <div class="inspector-header">Inspector</div>
+    <div id="inspectorContent">
+      <div class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        <h3>Select an item</h3>
+        <p>Click an agent, task, or event to inspect details</p>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<nav class="mobile-nav" role="navigation" aria-label="Mobile app navigation">
+  <div class="mobile-nav-inner">
+    <div class="mobile-nav-item active" data-mview="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Home</div>
+    <div class="mobile-nav-item" data-mview="swarms"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Swarms</div>
+    <div class="mobile-nav-item center-btn" data-mview="new"><div class="center-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>New</div>
+    <div class="mobile-nav-item" data-mview="agents"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Agents</div>
+    <div class="mobile-nav-item" data-mview="more"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>More</div>
+  </div>
+</nav>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     OVERLAYS
+     ═══════════════════════════════════════════════════════════ -->
+<div class="composer-overlay" id="composerOverlay" role="dialog" aria-modal="true" aria-label="Mission composer">
+  <div class="composer">
+    <h2>What shall we build <em>today?</em></h2>
+    <p class="composer-sub">One goal. A swarm of specialists. Real evidence. <span class="sl sl-sim">SIMULATED</span></p>
+    <textarea class="composer-input" id="composerInput" placeholder="Describe a goal, paste a task, or select a quick-start mission..." aria-label="Mission goal"></textarea>
+    <div style="margin-top:14px">
+      <div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:6px;letter-spacing:0.06em;text-transform:uppercase">Execution Mode</div>
+      <div class="composer-modes" role="radiogroup" aria-label="Mission mode">
+        <button class="composer-mode" data-mode="INSTANT">INSTANT</button>
+        <button class="composer-mode" data-mode="THINK">THINK</button>
+        <button class="composer-mode" data-mode="AGENT">AGENT</button>
+        <button class="composer-mode active" data-mode="SWARM">SWARM</button>
+        <button class="composer-mode" data-mode="AUTO">AUTO</button>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:6px;letter-spacing:0.06em;text-transform:uppercase">Quick Start</div>
+      <div class="composer-quick">
+        <button class="composer-quick-item" data-goal="Build an analytics SaaS dashboard">Build a SaaS dashboard</button>
+        <button class="composer-quick-item" data-goal="Deep research the AI agent market">Deep research a market</button>
+        <button class="composer-quick-item" data-goal="Design a responsive marketing website">Design a website</button>
+        <button class="composer-quick-item" data-goal="Analyze a customer dataset">Analyze a dataset</button>
+        <button class="composer-quick-item" data-goal="Audit the codebase for security">Audit a codebase</button>
+        <button class="composer-quick-item" data-goal="Create technical documentation">Create documentation</button>
+        <button class="composer-quick-item" data-goal="Deploy the project to production">Deploy a project</button>
+        <button class="composer-quick-item" data-goal="Run a security review">Security review</button>
+      </div>
+    </div>
+    <div class="composer-actions">
+      <button class="btn btn-ghost" id="composerCancel">Cancel</button>
+      <button class="btn btn-primary" id="composerStart"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>Start Mission</button>
+    </div>
+  </div>
+</div>
+
+<div class="cmd-overlay" id="cmdOverlay" role="dialog" aria-modal="true" aria-label="Command palette">
+  <div class="cmd-palette">
+    <input class="cmd-input" id="cmdInput" placeholder="Type a command..." aria-label="Command search">
+    <div class="cmd-list" id="cmdList" role="listbox"></div>
+  </div>
+</div>
+
+<div class="notification" id="notification" role="alert" aria-live="polite"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   VIEW TOGGLE
+   ═══════════════════════════════════════════════════════════════ */
+function toggleView(){
+  const pub=document.getElementById('publicView');
+  const app=document.getElementById('appView');
+  if(pub.classList.contains('hidden')){
+    pub.classList.remove('hidden');
+    app.classList.remove('active');
+    window.scrollTo(0,0);
+  }else{
+    pub.classList.add('hidden');
+    app.classList.add('active');
+    window.scrollTo(0,0);
+    if(!State.currentMission)showComposer();
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   MOBILE NAV TOGGLE
+   ═══════════════════════════════════════════════════════════════ */
+document.getElementById('navToggle').addEventListener('click',()=>{
+  const links=document.getElementById('navLinks');
+  const expanded=links.classList.toggle('open');
+  document.getElementById('navToggle').setAttribute('aria-expanded',expanded);
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   FAQ ACCORDION
+   ═══════════════════════════════════════════════════════════════ */
+document.querySelectorAll('.faq-question').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const item=btn.closest('.faq-item');
+    const isOpen=item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i=>{i.classList.remove('open');i.querySelector('.faq-question').setAttribute('aria-expanded','false')});
+    if(!isOpen){item.classList.add('open');btn.setAttribute('aria-expanded','true')}
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   APP STATE & BACKEND
+   ═══════════════════════════════════════════════════════════════ */
+const State={currentMission:null,currentView:'command',selectedAgent:null,selectedTask:null,traceFilter:'all',missionMode:'SWARM',engineRunning:false};
+
+const Backend={
+  missions:[],tasks:[],agents:[],events:[],approvals:[],evidence:[],artifacts:[],memories:[],skills:[],mcpServers:[],models:[],sequence:0,sseListeners:[],
+  initDemoData(){
+    this.agents=[
+      {id:'planner',name:'Planner',role:'Strategy & Orchestration',color:'#FF5A1F',tools:['filesystem','memory'],model:'qwen-max',sandbox:'planner-sbx',budget:0.06,status:'IDLE',currentTask:null,progress:0,cost:0,tokenIn:0,tokenOut:0,capabilities:['planning','decomposition']},
+      {id:'research',name:'Research Analyst',role:'Research & Intelligence',color:'#a855f7',tools:['fetch','browser'],model:'qwen-max',sandbox:'research-sbx',budget:0.12,status:'IDLE',currentTask:null,progress:0,cost:0,tokenIn:0,tokenOut:0,capabilities:['research','synthesis']},
+      {id:'architect',name:'Architect',role:'System Design',color:'#3b82f6',tools:['filesystem','memory'],model:'qwen-max',sandbox:'architect-sbx',budget:0.08,status:'IDLE',currentTask:null,progress:0,cost:0,tokenIn:0,tokenOut:0,capabilities:['architecture','design']},
+      {id:'backend',name:'Backend Developer',role:'API & Database',color:'#3b82f6',tools:['terminal','postgres','filesystem'],model:'qwen-max',sandbox:'backend-sbx',budget:0.17,status:'IDLE',currentTask:null,progress:0,cost:0,tokenIn:0,tokenOut:0,capabilities:['coding','api','database']},
+      {id:'frontend',name:'Frontend Developer',role:'UI & Experience',color:'#FF5A1F',tools:['terminal','filesystem'],model:'qwen-max',sandbox:'frontend-sbx',budget:0.14,status:'IDLE',currentTask:null,progress:0,cost:0,tokenIn:0,tokenOut:0,capabilities:['coding','ui','frontend']},
+      {id:'qa',name:'QA Engineer',role:'Testing & Quality',color:'#22c55e',tools:['terminal','filesystem'],model:'qwen-max',sandbox:'qa-sbx',budget:0.07,status:'IDLE',currentTask:null,progress:0,cost:0,tokenIn:0,tokenOut:0,capabilities:['testing','qa']},
+      {id:'security',name:'Security Reviewer',role:'Security & Compliance',color:'#ef4444',tools:['terminal','filesystem','fetch'],model:'qwen-max',sandbox:'security-sbx',budget:0.09,status:'IDLE',currentTask:null,progress:0,cost:0,tokenIn:0,tokenOut:0,capabilities:['security','audit']},
+      {id:'devops',name:'DevOps Engineer',role:'Deployment & Infrastructure',color:'#14b8a6',tools:['terminal','filesystem','fetch'],model:'qwen-max',sandbox:'devops-sbx',budget:0.06,status:'IDLE',currentTask:null,progress:0,cost:0,tokenIn:0,tokenOut:0,capabilities:['deployment','infrastructure']},
+    ];
+    this.models=[
+      {id:'qwen-max',provider:'Qwen',name:'qwen-max',capabilities:{reasoning:9,coding:8,research:7,toolCalling:true,mcp:true,contextWindow:32768},costTier:'medium',latency:'medium',status:'AVAILABLE',truthState:'LIVE_PROVIDER'},
+      {id:'qwen-plus',provider:'Qwen',name:'qwen-plus',capabilities:{reasoning:7,coding:7,research:7,toolCalling:true,mcp:true,contextWindow:131072},costTier:'low',latency:'fast',status:'AVAILABLE',truthState:'LIVE_PROVIDER'},
+      {id:'local-llama',provider:'Local',name:'llama-3.1-70b',capabilities:{reasoning:7,coding:7,research:6,toolCalling:true,mcp:false,contextWindow:8192,local:true},costTier:'free',latency:'variable',status:'AVAILABLE',truthState:'LIVE_LOCAL'},
+    ];
+    this.mcpServers=[
+      {id:'filesystem',name:'Filesystem',status:'UNAVAILABLE',tools:['read_file','write_file','list_dir','watch'],transport:'not_configured'},
+      {id:'git',name:'Git',status:'UNAVAILABLE',tools:['commit','push','pull','branch'],transport:'not_configured'},
+      {id:'browser',name:'Browser',status:'UNAVAILABLE',tools:['navigate','screenshot','extract'],transport:'not_configured'},
+      {id:'postgres',name:'Postgres',status:'UNAVAILABLE',tools:['query','migrate'],transport:'not_configured'},
+      {id:'fetch',name:'Fetch',status:'UNAVAILABLE',tools:['http_get','http_post'],transport:'not_configured'},
+    ];
+    this.memories=[
+      {id:'mem1',cat:'Project',text:'We use TypeScript for all services.'},
+      {id:'mem2',cat:'Project',text:'Primary package manager: pnpm.'},
+      {id:'mem3',cat:'User',text:'Preferred UI: technical dark mode.'},
+    ];
+    this.skills=[
+      {id:'skill1',name:'deploy-vercel',version:'2.1.0',steps:5,tools:['terminal','filesystem'],success:'HTTP 200',lastUsed:'2d ago',description:'Deploy a web project to Vercel.'},
+      {id:'skill2',name:'run-security-audit',version:'1.4.0',steps:4,tools:['terminal','fetch'],success:'0 critical findings',lastUsed:'5d ago',description:'Run security audit.'},
+      {id:'skill3',name:'create-react-dashboard',version:'3.0.0',steps:8,tools:['terminal','filesystem','postgres'],success:'Build passes',lastUsed:'1d ago',description:'Scaffold React dashboard.'},
+    ];
+  },
+  nextSequence(){return ++this.sequence},
+  async emitEvent(event){event.sequence=this.nextSequence();event.timestamp=new Date().toISOString();event.id='e_'+event.sequence;this.events.push(event);return event},
+  async createMission(goal,mode){
+    const mission={id:'m_'+Math.random().toString(36).substr(2,8),goal,mode,executionState:'DRAFT',truthState:'SIMULATED',createdAt:new Date().toISOString(),runId:'#'+Math.random().toString(36).substr(2,6),agents:0,tasks:0,cost:0,progress:0,budget:5.00};
+    this.missions.push(mission);
+    await this.emitEvent({missionId:mission.id,actor:'System',type:'MISSION_CREATED',detail:goal,truthState:'SIMULATED'});
+    return mission;
+  },
+  async updateMission(id,updates){const m=this.missions.find(x=>x.id===id);if(m)Object.assign(m,updates);return m},
+  async createTasks(missionId,tasks){tasks.forEach(t=>{t.missionId=missionId;t.executionState='PENDING';t.progress=0;this.tasks.push(t)});const mission=this.missions.find(m=>m.id===missionId);if(mission){mission.tasks=tasks.length;mission.agents=new Set(tasks.map(t=>t.agent)).size}return tasks},
+  async getTasks(missionId){return this.tasks.filter(t=>t.missionId===missionId)},
+  async updateTask(id,updates){const t=this.tasks.find(x=>x.id===id);if(t)Object.assign(t,updates);return t},
+  async createApproval(approval){approval.id='a_'+Math.random().toString(36).substr(2,6);approval.executionState='PENDING';approval.createdAt=new Date().toISOString();this.approvals.push(approval);return approval},
+  async decideApproval(id,decision){const a=this.approvals.find(x=>x.id===id);if(a){a.executionState=decision==='approve'?'APPROVED':'REJECTED';a.decision=decision;a.decidedAt=new Date().toISOString()}return a},
+  async getPendingApprovals(){return this.approvals.filter(a=>a.executionState==='PENDING')},
+  async addEvidence(e){e.id='ev_'+Math.random().toString(36).substr(2,6);e.collectedAt=new Date().toISOString();e.truthState='SIMULATED';this.evidence.push(e);return e},
+  async createArtifact(a){a.id='art_'+Math.random().toString(36).substr(2,6);a.sha256='sim_'+Math.random().toString(36).substr(2,16);a.createdAt=new Date().toISOString();a.truthState='SIMULATED';this.artifacts.push(a);return a},
+  async addMemory(m){m.id='mem_'+Math.random().toString(36).substr(2,6);this.memories.push(m);return m},
+  async deleteMemory(id){this.memories=this.memories.filter(m=>m.id!==id)},
+};
+Backend.initDemoData();
+
+/* ═══════════════════════════════════════════════════════════════
+   APP RENDER
+   ═══════════════════════════════════════════════════════════════ */
+function render(){
+  const main=document.getElementById('mainContent');
+  if(!State.currentMission){main.innerHTML=renderEmptyState();return}
+  switch(State.currentView){
+    case 'command':main.innerHTML=renderCommandCentre();break;
+    case 'missions':main.innerHTML=renderMissionsView();break;
+    case 'tasks':main.innerHTML=renderTasksView();break;
+    case 'agents':main.innerHTML=renderAgentsView();break;
+    case 'approvals':main.innerHTML=renderApprovalsView();break;
+    case 'evidence':main.innerHTML=renderEvidenceView();break;
+    case 'artifacts':main.innerHTML=renderArtifactsView();break;
+    case 'costs':main.innerHTML=renderCostsView();break;
+    case 'models':main.innerHTML=renderModelsView();break;
+    case 'policy':main.innerHTML=renderPolicyView();break;
+    case 'memory':main.innerHTML=renderMemoryView();break;
+    case 'skills':main.innerHTML=renderSkillsView();break;
+    case 'mcp':main.innerHTML=renderMCPView();break;
+    default:main.innerHTML=renderCommandCentre();
+  }
+  updateInspector();updateCounts();attachViewHandlers();
+}
+
+function renderEmptyState(){
+  return `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center" class="fade-in">
+    <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="1.2" style="margin-bottom:24px;opacity:0.9"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+    <h2 style="font-size:24px;font-weight:800;margin-bottom:10px;letter-spacing:-0.02em">No active mission</h2>
+    <p style="color:var(--text-dim);font-size:14px;margin-bottom:28px;max-width:440px;line-height:1.6">Describe a goal and AgentSwarm will orchestrate specialist agents to execute it.</p>
+    <button class="btn btn-primary btn-lg" onclick="showComposer()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>Start a Mission</button>
+  </div>`;
+}
+
+function renderCommandCentre(){
+  const m=State.currentMission;
+  const statusClass='status-'+m.executionState.toLowerCase();
+  const tasks=Backend.tasks.filter(t=>t.missionId===m.id);
+  const completedTasks=tasks.filter(t=>t.executionState==='SUCCEEDED').length;
+  const runningTasks=tasks.filter(t=>t.executionState==='RUNNING').length;
+  const pendingApprovals=Backend.approvals.filter(a=>a.executionState==='PENDING').length;
+  const totalCost=Backend.agents.reduce((s,a)=>s+a.cost,0);
+  const totalTokens=Backend.agents.reduce((s,a)=>s+a.tokenIn+a.tokenOut,0);
+  return `<div class="main-header fade-in">
+    <div class="mission-title-row"><h1 class="mission-title">${esc(m.goal)}</h1><span class="mission-status ${statusClass}">${m.executionState.replace('_',' ')}</span><span class="sl sl-sim">SIMULATED</span></div>
+    <div class="mission-meta"><span>Started ${timeAgo(m.createdAt)}</span><span class="mono">Run ID: ${m.runId}</span><span>Mode: ${m.mode}</span><span>${m.agents} agents · ${m.tasks} tasks</span></div>
+  </div>
+  <div class="truth-banner fade-in">
+    <div class="truth-icon sim"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"/><path d="M12 8v4M12 16h.01"/></svg></div>
+    <div style="flex:1"><div style="font-weight:700;font-size:12px;margin-bottom:2px">Truth State: <span class="sl sl-sim" style="margin-left:4px">${m.truthState}</span></div><div style="font-size:11px;color:var(--text-dim)">Execution state: ${m.executionState} · All telemetry in this demo is simulated.</div></div>
+  </div>
+  <div class="kpi-row fade-in">
+    <div class="kpi-card"><div class="kpi-label">Active Agents</div><div class="kpi-value">${runningTasks>0?runningTasks:(completedTasks>0?completedTasks:0)}</div><div class="kpi-sub ${runningTasks>0?'positive':''}">${runningTasks>0?'+'+runningTasks+' running':(completedTasks>0?completedTasks+' completed':'idle')}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Tasks Completed</div><div class="kpi-value">${completedTasks}<span style="font-size:14px;color:var(--text-muted)">/${tasks.length}</span></div><div class="kpi-sub positive">+${completedTasks} today</div></div>
+    <div class="kpi-card"><div class="kpi-label">Tokens Used</div><div class="kpi-value">${(totalTokens/1000).toFixed(1)}K</div><div class="kpi-sub">+${(Backend.agents.reduce((s,a)=>s+a.tokenIn,0)/1000).toFixed(1)}K in</div></div>
+    <div class="kpi-card"><div class="kpi-label">Est. Cost</div><div class="kpi-value">$${totalCost.toFixed(2)}</div><div class="kpi-sub unknown">Budget: $${m.budget.toFixed(2)} · <span class="sl sl-fix" style="font-size:9px">FIXTURE</span></div></div>
+  </div>
+  <div class="section-app fade-in">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:12px;font-weight:700">Overall Progress</span><span class="mono" style="font-size:12px;font-weight:700">${m.progress}%</span></div>
+    <div class="progress-bar"><div class="progress-fill" style="width:${m.progress}%"></div></div>
+  </div>
+  <div class="section-app fade-in">
+    <div class="section-header-app"><div class="section-title-app"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>Task DAG</div><span class="section-action" onclick="switchView('tasks')">View all tasks ›</span></div>
+    <div class="dag-container">${renderDAG(tasks)}</div>
+  </div>
+  <div class="section-app fade-in">
+    <div class="section-header-app"><div class="section-title-app"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Active Agents</div><span class="section-action" onclick="switchView('agents')">View all ›</span></div>
+    <div class="agent-list">${Backend.agents.map(a=>renderAgentCard(a)).join('')}</div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px" class="fade-in">
+    <div>
+      <div class="section-header-app"><div class="section-title-app"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Activity Trace</div></div>
+      <div class="trace-container">
+        <div class="trace-filters">
+          <button class="trace-filter ${State.traceFilter==='all'?'active':''}" data-filter="all">All</button>
+          <button class="trace-filter ${State.traceFilter==='agent'?'active':''}" data-filter="agent">Agents</button>
+          <button class="trace-filter ${State.traceFilter==='tool'?'active':''}" data-filter="tool">Tools</button>
+          <button class="trace-filter ${State.traceFilter==='approval'?'active':''}" data-filter="approval">Approvals</button>
+        </div>
+        <div class="trace-list">${renderTrace()}</div>
+      </div>
+    </div>
+    <div>
+      <div class="section-header-app"><div class="section-title-app"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Pending Approvals${pendingApprovals>0?`<span style="background:var(--orange);color:#fff;font-size:10px;padding:1px 7px;border-radius:10px;margin-left:6px;font-weight:700">${pendingApprovals}</span>`:''}</div></div>
+      ${pendingApprovals>0?Backend.approvals.filter(a=>a.executionState==='PENDING').map(a=>renderApprovalCard(a)).join(''):'<div class="empty-state" style="padding:24px"><p>No pending approvals</p></div>'}
+    </div>
+  </div>
+  <div class="section-app fade-in" style="display:flex;gap:8px;flex-wrap:wrap">
+    ${m.executionState!=='COMPLETED'&&m.executionState!=='CANCELLED'?`<button class="btn btn-ghost" onclick="pauseMission()">⏸ Pause</button><button class="btn btn-ghost" onclick="stopMission()"> Stop</button>`:''}
+    <button class="btn btn-ghost" onclick="showComposer()">+ New Mission</button>
+    <button class="btn btn-ghost" onclick="resetDemo()">↺ Reset</button>
+  </div>`;
+}
+
+function renderDAG(tasks){
+  const positions={t1:{x:300,y:30},t2:{x:140,y:110},t3:{x:460,y:110},t4:{x:240,y:190},t5:{x:460,y:190},t6:{x:350,y:250},t7:{x:560,y:250},t8:{x:450,y:310}};
+  const edges=[{from:'t1',to:'t2'},{from:'t1',to:'t3'},{from:'t3',to:'t4'},{from:'t3',to:'t5'},{from:'t4',to:'t6'},{from:'t5',to:'t6'},{from:'t4',to:'t7'},{from:'t6',to:'t8'},{from:'t7',to:'t8'}];
+  let svg=`<svg class="dag-svg" viewBox="0 0 700 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Task dependency graph">`;
+  edges.forEach(e=>{const from=positions[e.from];const to=positions[e.to];const fromTask=tasks.find(t=>t.id===e.from);const isDone=fromTask&&fromTask.executionState==='SUCCEEDED';const isActive=fromTask&&fromTask.executionState==='RUNNING';svg+=`<line class="dag-edge ${isDone?'done':isActive?'active':''}" x1="${from.x}" y1="${from.y+22}" x2="${to.x}" y2="${to.y-22}"/>`});
+  tasks.forEach(t=>{const pos=positions[t.id];if(!pos)return;const cls=t.executionState.toLowerCase();const agent=Backend.agents.find(a=>a.id===t.agent);const color=agent?agent.color:'var(--text-dim)';svg+=`<g class="dag-node" onclick="selectTask('${t.id}')" tabindex="0" role="button"><rect class="dag-node-rect ${cls}" x="${pos.x-72}" y="${pos.y-22}" width="144" height="44" rx="8"/><text class="dag-node-label" x="${pos.x}" y="${pos.y-2}" text-anchor="middle">${esc(t.name)}</text><text class="dag-node-sub" x="${pos.x}" y="${pos.y+12}" text-anchor="middle" fill="${color}">${t.agent||'unassigned'}</text></g>`});
+  svg+=`</svg><div style="display:flex;gap:16px;margin-top:12px;font-size:10px;color:var(--text-dim);flex-wrap:wrap"><span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:50%;background:var(--green)"></span>Completed</span><span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:50%;background:var(--blue)"></span>Running</span><span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:50%;background:var(--amber)"></span>Waiting</span><span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:50%;background:var(--red)"></span>Blocked</span><span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:50%;background:var(--border)"></span>Pending</span></div>`;
+  return svg;
+}
+
+function renderAgentCard(a){
+  const statusColors={RUNNING:'var(--blue)',IDLE:'var(--text-muted)',COMPLETED:'var(--green)'};
+  const statusLabels={RUNNING:'Running',IDLE:'Idle',COMPLETED:'Completed'};
+  const isSelected=State.selectedAgent===a.id;
+  return `<div class="agent-card ${isSelected?'selected':''}" onclick="selectAgent('${a.id}')" tabindex="0" role="button">
+    <div class="agent-icon" style="background:${a.color}20;color:${a.color}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"/><path d="M12 6v6l4 2"/></svg></div>
+    <div class="agent-info"><div class="agent-name">${a.name}</div><div class="agent-role">${a.role}</div></div>
+    <div class="agent-status"><span class="dot" style="background:${statusColors[a.status]||'var(--text-muted)'}"></span>${statusLabels[a.status]||a.status}</div>
+    <div class="agent-progress"><div class="agent-progress-bar"><div class="agent-progress-fill" style="width:${a.progress}%;background:${a.color}"></div></div><div class="agent-pct" style="color:${a.color}">${a.progress}%</div></div>
+  </div>`;
+}
+
+function renderApprovalCard(a){
+  return `<div class="approval-card fade-in">
+    <span class="approval-risk risk-${a.risk.toLowerCase()}">${a.risk} RISK</span>
+    <div class="approval-title">${esc(a.title)}</div>
+    ${a.destination?`<div class="approval-detail">Destination: <span class="mono">${a.destination}</span></div>`:''}
+    ${a.method?`<div class="approval-detail">Method: <span class="mono">${a.method}</span></div>`:''}
+    ${a.scope?`<div class="approval-detail">Scope: ${a.scope}</div>`:''}
+    <div class="approval-actions"><button class="btn btn-danger btn-sm" onclick="handleApproval('${a.id}','reject')">Reject</button><button class="btn btn-primary btn-sm" onclick="handleApproval('${a.id}','approve')">Approve</button></div>
+  </div>`;
+}
+
+function renderTrace(){
+  const events=Backend.events.filter(e=>e.missionId===State.currentMission?.id);
+  const filtered=State.traceFilter==='all'?events:events.filter(e=>{if(State.traceFilter==='agent')return e.type.includes('TASK');if(State.traceFilter==='tool')return e.type==='TOOL_CALLED';if(State.traceFilter==='approval')return e.type.includes('APPROVAL');return true});
+  if(filtered.length===0)return '<div class="empty-state" style="padding:24px"><p>No events yet.</p></div>';
+  return filtered.slice().reverse().map(e=>`<div class="trace-item"><span class="trace-seq">#${e.sequence}</span><span class="trace-time">${formatTime(e.timestamp)}</span><span class="trace-actor">${e.actor}</span><span class="trace-event"><span class="mono">${e.type}</span> — ${esc(e.detail)}</span><span class="trace-tag sl sl-${e.truthState==='SIMULATED'?'sim':'fix'}">${e.truthState}</span></div>`).join('');
+}
+
+function renderMissionsView(){
+  return `<div class="main-header fade-in"><h1 class="mission-title">Swarms</h1><p style="color:var(--text-dim);font-size:13px;margin-top:4px">All missions</p></div>
+  <div class="section-app fade-in">${State.currentMission?`<div class="agent-card" onclick="switchView('command')" style="cursor:pointer"><div class="agent-icon" style="background:var(--orange)20;color:var(--orange)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><div class="agent-info"><div class="agent-name">${esc(State.currentMission.goal)}</div><div class="agent-role">Run ID: ${State.currentMission.runId} · ${State.currentMission.mode}</div></div><span class="mission-status status-${State.currentMission.executionState.toLowerCase()}">${State.currentMission.executionState.replace('_',' ')}</span></div>`:'<div class="empty-state"><p>No missions yet</p></div>'}</div>
+  <button class="btn btn-primary" onclick="showComposer()" style="margin-top:12px">+ New Mission</button>`;
+}
+
+function renderTasksView(){
+  const tasks=Backend.tasks.filter(t=>t.missionId===State.currentMission?.id);
+  return `<div class="main-header fade-in"><h1 class="mission-title">Tasks</h1><p style="color:var(--text-dim);font-size:13px;margin-top:4px">${tasks.filter(t=>t.executionState==='SUCCEEDED').length}/${tasks.length} completed</p></div>
+  <div class="section-app fade-in">${tasks.map(t=>{const statusColors={PENDING:'var(--border)',RUNNING:'var(--blue)',SUCCEEDED:'var(--green)',BLOCKED:'var(--red)'};const agent=Backend.agents.find(a=>a.id===t.agent);return `<div class="agent-card" onclick="selectTask('${t.id}')" style="cursor:pointer"><div class="agent-icon" style="background:${agent?agent.color:'var(--border)'}20;color:${agent?agent.color:'var(--text-dim)'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div><div class="agent-info"><div class="agent-name">${esc(t.name)}</div><div class="agent-role">${t.type} · ${t.agent||'Unassigned'}</div></div><div class="agent-progress" style="width:100px"><div class="agent-progress-bar"><div class="agent-progress-fill" style="width:${t.progress}%;background:${statusColors[t.executionState]||'var(--border)'}"></div></div><div class="agent-pct" style="color:${statusColors[t.executionState]||'var(--text-dim)'}">${t.executionState.replace('_',' ')} · ${t.progress}%</div></div></div>`}).join('')}</div>`;
+}
+
+function renderAgentsView(){
+  return `<div class="main-header fade-in"><h1 class="mission-title">Agents</h1><p style="color:var(--text-dim);font-size:13px;margin-top:4px">${Backend.agents.filter(a=>a.status==='RUNNING').length} running · ${Backend.agents.filter(a=>a.status==='IDLE').length} idle</p></div>
+  <div class="section-app fade-in"><div class="agent-list">${Backend.agents.map(a=>renderAgentCard(a)).join('')}</div></div>`;
+}
+
+function renderApprovalsView(){
+  const pending=Backend.approvals.filter(a=>a.executionState==='PENDING');
+  const decided=Backend.approvals.filter(a=>a.executionState!=='PENDING');
+  return `<div class="main-header fade-in"><h1 class="mission-title">Approvals</h1><p style="color:var(--text-dim);font-size:13px;margin-top:4px">${pending.length} pending · ${decided.length} decided</p></div>
+  <div class="section-app fade-in"><div class="tab-bar"><div class="tab active">Pending (${pending.length})</div><div class="tab">Decided (${decided.length})</div></div>${pending.length>0?pending.map(a=>renderApprovalCard(a)).join(''):'<div class="empty-state"><p>No pending approvals</p></div>'}</div>`;
+}
+
+function renderEvidenceView(){
+  return `<div class="main-header fade-in"><h1 class="mission-title">Evidence Ledger</h1><p style="color:var(--text-dim);font-size:13px;margin-top:4px">${Backend.evidence.length} items · <span class="sl sl-fix">FIXTURE</span></p></div>
+  <div class="section-app fade-in">${Backend.evidence.length>0?Backend.evidence.map(e=>`<div class="evidence-card" style="background:var(--bg-elev);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:14px;margin-bottom:10px"><div style="font-size:10px;font-weight:700;color:var(--orange);font-family:var(--font-mono);margin-bottom:4px">${e.sourceType} · ${e.source}</div><div style="font-size:12px;line-height:1.5;margin-bottom:8px">"${esc(e.claim)}"</div><div style="display:flex;gap:12px;font-size:10px;color:var(--text-dim);flex-wrap:wrap"><span>Trust: ${e.trust}</span><span class="${(e.confidence||0)>0.7?'confidence-high':'confidence-low'}">Confidence: ${Math.round((e.confidence||0)*100)}%</span></div></div>`).join(''):'<div class="empty-state"><h3>No evidence yet</h3></div>'}</div>`;
+}
+
+function renderArtifactsView(){
+  const artifacts=Backend.artifacts.filter(a=>a.missionId===State.currentMission?.id);
+  return `<div class="main-header fade-in"><h1 class="mission-title">Artifacts</h1><p style="color:var(--text-dim);font-size:13px;margin-top:4px">${artifacts.length} artifacts · <span class="sl sl-fix">FIXTURE</span></p></div>
+  <div class="section-app fade-in">${artifacts.length>0?`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px">${artifacts.map(art=>`<div class="artifact-card" style="background:var(--bg-elev);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:14px"><div style="width:32px;height:32px;border-radius:var(--radius);background:var(--bg-elev2);display:flex;align-items:center;justify-content:center;margin-bottom:10px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;color:var(--orange)"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div style="font-size:12px;font-weight:700;margin-bottom:3px">${art.name}</div><div style="font-size:10px;color:var(--text-dim)">${art.type} · ${art.version}</div><div style="font-size:10px;color:var(--text-dim);margin-top:4px">by ${art.createdBy}</div></div>`).join('')}</div>`:'<div class="empty-state"><h3>No artifacts yet</h3></div>'}</div>`;
+}
+
+function renderCostsView(){
+  const totalCost=Backend.agents.reduce((s,a)=>s+a.cost,0);
+  const totalTokens=Backend.agents.reduce((s,a)=>s+a.tokenIn+a.tokenOut,0);
+  return `<div class="main-header fade-in"><h1 class="mission-title">Cost Inspector</h1><p style="color:var(--text-dim);font-size:13px;margin-top:4px"><span class="sl sl-fix">FIXTURE PRICING</span></p></div>
+  <div class="section-app fade-in"><div style="background:var(--bg-elev);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:16px">
+    <div style="font-size:28px;font-weight:800;font-family:var(--font-mono);letter-spacing:-0.02em;margin-bottom:4px">$${totalCost.toFixed(2)}</div>
+    <div style="font-size:11px;color:var(--text-dim);margin-bottom:12px">EST. TOTAL · Actual cost: <span class="sl sl-unknown">UNKNOWN</span></div>
+    <div style="height:6px;background:var(--bg-elev3);border-radius:3px;overflow:hidden;margin-bottom:12px"><div style="height:100%;border-radius:3px;background:linear-gradient(90deg,var(--orange),var(--purple));width:${Math.min(100,(totalCost/5)*100)}%"></div></div>
+    <div style="display:flex;flex-direction:column;gap:6px">${Backend.agents.map(a=>`<div style="display:flex;align-items:center;justify-content:space-between;font-size:12px"><div style="display:flex;align-items:center;gap:8px"><div style="width:8px;height:8px;border-radius:50%;background:${a.color}"></div>${a.name}</div><div style="font-family:var(--font-mono);font-size:11px">$${a.cost.toFixed(3)}</div></div>`).join('')}</div>
+    <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border-subtle)"><div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px"><span style="color:var(--text-dim)">Total Tokens</span><span style="font-family:var(--font-mono);font-size:11px;text-align:right">${totalTokens.toLocaleString()}</span></div><div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px"><span style="color:var(--text-dim)">Input Tokens</span><span style="font-family:var(--font-mono);font-size:11px;text-align:right">${Backend.agents.reduce((s,a)=>s+a.tokenIn,0).toLocaleString()}</span></div><div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px"><span style="color:var(--text-dim)">Output Tokens</span><span style="font-family:var(--font-mono);font-size:11px;text-align:right">${Backend.agents.reduce((s,a)=>s+a.tokenOut,0).toLocaleString()}</span></div></div>
+    <div style="font-size:10px;color:var(--text-muted);padding:8px 10px;background:var(--bg-elev2);border-radius:var(--radius);border-left:2px solid var(--orange);margin-top:8px">Fixture pricing — not billed. <span class="sl sl-fix">FIXTURE</span></div>
+  </div></div>`;
+}
+
+function renderModelsView(){
+  return `<div class="main-header fade-in"><h1 class="mission-title">Model Fabric</h1><p style="color:var(--text-dim);font-size:13px;margin-top:4px">Provider-agnostic model routing</p></div>
+  <div class="section-app fade-in"><div class="agent-list">${Backend.models.map(m=>`<div class="agent-card" style="cursor:default"><div class="agent-icon" style="background:var(--bg-elev2);color:var(--text-dim)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div><div class="agent-info"><div class="agent-name">${m.name} <span class="sl sl-${m.truthState==='LIVE_PROVIDER'?'live':'fix'}" style="margin-left:6px">${m.truthState}</span></div><div class="agent-role">${m.provider} · Context: ${m.capabilities.contextWindow.toLocaleString()} · Cost: ${m.costTier}</div></div><div style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono)">${m.capabilities.toolCalling?'✓ tools':''} ${m.capabilities.mcp?'✓ mcp':''} ${m.capabilities.local?'✓ local':''}</div></div>`).join('')}</div></div>`;
+}
+
+function renderPolicyView(){
+  const POLICY_RULES=[{pattern:'filesystem.read',decision:'ALLOW',reason:'Read-only safe'},{pattern:'filesystem.write',decision:'ASK',reason:'Write requires approval'},{pattern:'filesystem.delete',decision:'DENY',reason:'Destructive blocked'},{pattern:'git.status',decision:'ALLOW',reason:'Read-only safe'},{pattern:'git.commit',decision:'ASK',reason:'Commit requires review'},{pattern:'git.push',decision:'ASK',reason:'Push requires approval'},{pattern:'shell.rm',decision:'DENY',reason:'Destructive blocked'},{pattern:'http.get',decision:'ASK',reason:'External network'},{pattern:'secret.read',decision:'DENY',reason:'Secret access blocked'}];
+  return `<div class="main-header fade-in"><h1 class="mission-title">Policy Engine</h1><p style="color:var(--text-dim);font-size:13px;margin-top:4px">ALLOW · ASK · DENY</p></div>
+  <div class="section-app fade-in"><div style="margin-bottom:16px;padding:12px;background:var(--bg-elev2);border-radius:var(--radius-lg);border:1px solid var(--border-subtle)"><div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:8px;letter-spacing:0.06em;text-transform:uppercase">Evaluation Logic</div><div style="font-size:12px;font-family:var(--font-mono);line-height:1.6;color:var(--text-dim)"><div>for each tool_invocation:</div><div style="padding-left:16px">pattern = match(invocation.tool, policy.pattern)</div><div style="padding-left:16px">if pattern matches:</div><div style="padding-left:32px">ALLOW → execute</div><div style="padding-left:32px">ASK → create approval</div><div style="padding-left:32px">DENY → reject</div></div></div>
+  <div style="display:flex;flex-direction:column;gap:6px">${POLICY_RULES.map(r=>`<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg-elev);border:1px solid var(--border-subtle);border-radius:var(--radius);font-size:12px"><span style="font-family:var(--font-mono);font-size:11px;flex:1">${r.pattern}</span><span class="sl sl-${r.decision==='ALLOW'?'live':r.decision==='ASK'?'fix':'unavail'}" style="font-family:var(--font-mono);font-size:10px;font-weight:700">${r.decision}</span><span style="font-size:10px;color:var(--text-muted);max-width:200px">${r.reason}</span></div>`).join('')}</div></div>`;
+}
+
+function renderMemoryView(){
+  return `<div class="main-header fade-in"><h1 class="mission-title">Memory</h1><p style="color:var(--text-dim);font-size:13px;margin-top:4px">${Backend.memories.length} items · <span class="sl sl-fix">FIXTURE</span></p></div>
+  <div class="section-app fade-in"><div style="display:flex;flex-direction:column;gap:6px">${Backend.memories.map(m=>`<div style="display:flex;align-items:flex-start;gap:10px;padding:10px;background:var(--bg-elev);border:1px solid var(--border-subtle);border-radius:var(--radius)"><span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;background:var(--orange-glow);color:var(--orange);font-family:var(--font-mono);flex-shrink:0">${m.cat}</span><span style="flex:1;font-size:12px">${esc(m.text)}</span><button class="btn btn-ghost btn-sm" onclick="deleteMemory('${m.id}')" style="padding:4px 8px;font-size:10px">✕</button></div>`).join('')}</div>
+  <div style="margin-top:16px"><div style="font-size:11px;font-weight:700;margin-bottom:8px;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted)">Add Memory</div><div style="display:flex;gap:8px"><select id="memCat" style="padding:8px;background:var(--bg-elev2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:12px"><option>User</option><option>Project</option><option>Mission</option></select><input id="memText" placeholder="Add a memory..." style="flex:1;padding:8px;background:var(--bg-elev2);border:1px solid var(--border);border-radius:var(--radius);font-size:12px"><button class="btn btn-primary btn-sm" onclick="addMemory()">Add</button></div></div></div>`;
+}
+
+function renderSkillsView(){
+  return `<div class="main-header fade-in"><h1 class="mission-title">Skills</h1><p style="color:var(--text-dim);font-size:13px;margin-top:4px">Reusable workflows · <span class="sl sl-fix">FIXTURE</span></p></div>
+  <div class="section-app fade-in"><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px">${Backend.skills.map(s=>`<div style="background:var(--bg-elev);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:14px"><div style="width:32px;height:32px;border-radius:var(--radius);background:var(--bg-elev2);display:flex;align-items:center;justify-content:center;margin-bottom:10px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;color:var(--orange)"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><div style="font-size:12px;font-weight:700;margin-bottom:3px">${s.name}</div><div style="font-size:11px;color:var(--text-dim);margin-bottom:8px">${s.description}</div><div style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono)">v${s.version} · ${s.steps} steps · Last: ${s.lastUsed}</div></div>`).join('')}</div></div>`;
+}
+
+function renderMCPView(){
+  return `<div class="main-header fade-in"><h1 class="mission-title">MCP / Tools</h1><p style="color:var(--text-dim);font-size:13px;margin-top:4px">Model Context Protocol</p></div>
+  <div class="section-app fade-in">${Backend.mcpServers.map(s=>`<div class="agent-card" style="cursor:default"><div class="agent-icon" style="background:var(--bg-elev2);color:var(--text-dim)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div><div class="agent-info"><div class="agent-name">${s.name} <span class="sl sl-unavail" style="margin-left:6px">${s.status}</span></div><div class="agent-role">Transport: ${s.transport} · Tools: ${s.tools.join(', ')}</div></div></div>`).join('')}<div class="inspector-note" style="margin-top:16px">MCP servers show as UNAVAILABLE until a real transport adapter is configured.</div></div>`;
+}
+
+function updateInspector(){
+  const el=document.getElementById('inspectorContent');
+  if(State.selectedAgent){
+    const a=Backend.agents.find(ag=>ag.id===State.selectedAgent);
+    if(a){el.innerHTML=`<div style="margin-bottom:16px"><div style="font-size:10px;font-weight:700;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.06em">Agent</div><div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><div class="agent-icon" style="background:${a.color}20;color:${a.color};width:40px;height:40px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"/><path d="M12 6v6l4 2"/></svg></div><div><div style="font-weight:800;font-size:14px">${a.name}</div><div style="font-size:11px;color:var(--text-dim)">${a.role}</div></div></div></div><div style="margin-bottom:16px"><div style="font-size:10px;font-weight:700;color:var(--text-dim);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.06em">Status</div><div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px"><span style="color:var(--text-dim)">Status</span><span style="font-family:var(--font-mono);font-size:11px;text-align:right">${a.status}</span></div><div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px"><span style="color:var(--text-dim)">Current Task</span><span style="font-family:var(--font-mono);font-size:11px;text-align:right">${a.currentTask||'—'}</span></div><div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px"><span style="color:var(--text-dim)">Progress</span><span style="font-family:var(--font-mono);font-size:11px;text-align:right">${a.progress}%</span></div></div><div style="margin-bottom:16px"><div style="font-size:10px;font-weight:700;color:var(--text-dim);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.06em">Runtime</div><div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px"><span style="color:var(--text-dim)">Model</span><span style="font-family:var(--font-mono);font-size:11px;text-align:right">${a.model} <span class="sl sl-fix" style="font-size:8px">FIXTURE</span></span></div><div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px"><span style="color:var(--text-dim)">Tools</span><span style="font-family:var(--font-mono);font-size:11px;text-align:right">${a.tools.join(', ')}</span></div></div><div style="margin-bottom:16px"><div style="font-size:10px;font-weight:700;color:var(--text-dim);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.06em">Telemetry</div><div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px"><span style="color:var(--text-dim)">Cost</span><span style="font-family:var(--font-mono);font-size:11px;text-align:right">$${a.cost.toFixed(3)} est.</span></div><div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px"><span style="color:var(--text-dim)">Tokens In</span><span style="font-family:var(--font-mono);font-size:11px;text-align:right">${a.tokenIn.toLocaleString()}</span></div><div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px"><span style="color:var(--text-dim)">Tokens Out</span><span style="font-family:var(--font-mono);font-size:11px;text-align:right">${a.tokenOut.toLocaleString()}</span></div></div><div style="font-size:10px;color:var(--text-muted);padding:8px 10px;background:var(--bg-elev2);border-radius:var(--radius);border-left:2px solid var(--orange)">Telemetry is simulated. <span class="sl sl-sim">SIMULATED</span></div>`;return}
+  }
+  if(State.selectedTask){
+    const t=Backend.tasks.find(tk=>tk.id===State.selectedTask);
+    if(t){el.innerHTML=`<div style="margin-bottom:16px"><div style="font-size:10px;font-weight:700;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.06em">Task</div><div style="font-weight:800;font-size:14px;margin-bottom:4px">${esc(t.name)}</div><div style="font-size:11px;color:var(--text-dim);font-family:var(--font-mono)">ID: ${t.id} · Type: ${t.type}</div></div><div style="margin-bottom:16px"><div style="font-size:10px;font-weight:700;color:var(--text-dim);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.06em">Status</div><div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px"><span style="color:var(--text-dim)">State</span><span style="font-family:var(--font-mono);font-size:11px;text-align:right">${t.executionState}</span></div><div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px"><span style="color:var(--text-dim)">Progress</span><span style="font-family:var(--font-mono);font-size:11px;text-align:right">${t.progress}%</span></div><div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px"><span style="color:var(--text-dim)">Agent</span><span style="font-family:var(--font-mono);font-size:11px;text-align:right">${t.agent||'—'}</span></div></div>`;return}
+  }
+  el.innerHTML=`<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><h3>Select an item</h3><p>Click an agent, task, or event</p></div>`;
+}
+
+function selectAgent(id){State.selectedAgent=id;State.selectedTask=null;render()}
+function selectTask(id){State.selectedTask=id;State.selectedAgent=null;render()}
+function switchView(view){State.currentView=view;document.querySelectorAll('.sidebar-item').forEach(el=>{el.classList.toggle('active',el.dataset.view===view)});render()}
+
+function showComposer(){document.getElementById('composerOverlay').classList.add('active');document.getElementById('composerInput').focus()}
+function hideComposer(){document.getElementById('composerOverlay').classList.remove('active')}
+
+async function startMissionFromComposer(){
+  const goal=document.getElementById('composerInput').value.trim();
+  if(!goal){notify('Please enter a goal','error');return}
+  hideComposer();
+  State.currentView='command';
+  await createMission(goal);
+}
+
+async function createMission(goal){
+  const mission=await Backend.createMission(goal,State.missionMode);
+  State.currentMission=mission;
+  const tasks=[{id:'t1',name:'Requirements & Discovery',agent:'planner',type:'PLANNING',deps:[],duration:3},{id:'t2',name:'Competitor Research',agent:'research',type:'RESEARCH',deps:['t1'],duration:4},{id:'t3',name:'Architecture Design',agent:'architect',type:'PLANNING',deps:['t1'],duration:4},{id:'t4',name:'Backend API',agent:'backend',type:'CODING',deps:['t3'],duration:5},{id:'t5',name:'Frontend UI',agent:'frontend',type:'CODING',deps:['t3'],duration:5},{id:'t6',name:'Integration & QA',agent:'qa',type:'VERIFICATION',deps:['t4','t5'],duration:3},{id:'t7',name:'Security Review',agent:'security',type:'REVIEW',deps:['t4'],duration:3},{id:'t8',name:'Deployment',agent:'devops',type:'DELIVERY',deps:['t6','t7'],duration:3}];
+  await Backend.createTasks(mission.id,tasks);
+  await Backend.createApproval({risk:'HIGH',title:'Allow external network request?',destination:'api.stripe.com',method:'HTTPS GET',scope:'Payment validation',agent:'backend',task:'Backend API'});
+  await Backend.createApproval({risk:'MEDIUM',title:'Commit & push proposed changes?',branch:'feat/dashboard',files:14,tests:'42 passed',findings:0,agent:'devops',task:'Deployment'});
+  await Backend.addEvidence({missionId:mission.id,source:'Multi-agent isolation study',sourceType:'WEB',sourceRef:'https://example.com/study',trust:'PRIMARY',claim:'Sandbox isolation reduces cross-task contamination by 94%.',confidence:0.92,supporting:['S1','S2'],contradicting:[]});
+  await Backend.updateMission(mission.id,{executionState:'PLANNING'});
+  State.currentMission.executionState='PLANNING';
+  render();
+  setTimeout(()=>startMissionEngine(),600);
+  notify('Mission created','success');
+}
+
+async function startMissionEngine(){
+  if(State.engineRunning)return;
+  State.engineRunning=true;
+  const mission=State.currentMission;
+  const tasks=await Backend.getTasks(mission.id);
+  for(let i=0;i<tasks.length;i++){
+    if(!State.engineRunning)break;
+    const task=tasks[i];
+    const agent=Backend.agents.find(a=>a.id===task.agent);
+    const depsMet=task.deps.every(depId=>{const dep=tasks.find(t=>t.id===depId);return dep&&dep.executionState==='SUCCEEDED'});
+    if(!depsMet){await Backend.updateTask(task.id,{executionState:'BLOCKED'});continue}
+    await Backend.updateTask(task.id,{executionState:'RUNNING'});
+    if(agent){agent.status='RUNNING';agent.currentTask=task.name}
+    await Backend.emitEvent({missionId:mission.id,actor:agent?.name||'System',type:'TASK_STARTED',detail:task.name,truthState:'SIMULATED'});
+    State.currentMission.executionState='RUNNING';render();await delay(1400);
+    if(agent&&Math.random()>0.25){const toolName=agent.tools[Math.floor(Math.random()*agent.tools.length)];await Backend.emitEvent({missionId:mission.id,actor:agent.name,type:'TOOL_CALLED',detail:`${toolName}.operation`,truthState:'SIMULATED'});agent.cost=+(agent.cost+0.01+Math.random()*0.02).toFixed(3);agent.tokenIn+=Math.floor(Math.random()*500+200);agent.tokenOut+=Math.floor(Math.random()*300+100);await delay(800)}
+    if(i===3||i===7){const pending=await Backend.getPendingApprovals();if(pending.length>0){State.currentMission.executionState='WAITING_APPROVAL';render();await waitForApproval();if(!State.engineRunning)break}}
+    await Backend.updateTask(task.id,{executionState:'SUCCEEDED',progress:100});
+    if(agent){agent.status='IDLE';agent.currentTask=null;agent.progress=100}
+    await Backend.emitEvent({missionId:mission.id,actor:agent?.name||'System',type:'TASK_COMPLETED',detail:task.name,truthState:'SIMULATED'});
+    const completed=tasks.filter(t=>t.executionState==='SUCCEEDED').length;
+    const progress=Math.round((completed/tasks.length)*100);
+    await Backend.updateMission(mission.id,{progress});
+    State.currentMission.progress=progress;render();await delay(400);
+  }
+  State.currentMission.executionState='VERIFYING';
+  await Backend.updateMission(mission.id,{executionState:'VERIFYING'});
+  await Backend.emitEvent({missionId:mission.id,actor:'System',type:'VERIFICATION_STARTED',detail:'Running verification gates',truthState:'SIMULATED'});
+  render();await delay(1200);
+  await Backend.createArtifact({missionId:mission.id,name:'Dashboard.tsx',type:'Code',version:'v3',createdBy:'Frontend Developer',task:'Frontend UI',mimeType:'text/typescript',size:4280});
+  await Backend.createArtifact({missionId:mission.id,name:'Architecture Diagram',type:'Diagram',version:'v2',createdBy:'Architect',task:'Architecture Design',mimeType:'image/svg+xml',size:12400});
+  await Backend.updateMission(mission.id,{executionState:'COMPLETED',progress:100});
+  State.currentMission.executionState='COMPLETED';State.engineRunning=false;
+  await Backend.emitEvent({missionId:mission.id,actor:'System',type:'MISSION_COMPLETED',detail:'All gates passed',truthState:'SIMULATED'});
+  render();notify('Mission verified','success');
+}
+
+function waitForApproval(){return new Promise(resolve=>{const check=setInterval(()=>{Backend.getPendingApprovals().then(a=>{if(a.length===0){clearInterval(check);resolve()}})},400)})}
+
+async function handleApproval(id,decision){
+  await Backend.decideApproval(id,decision);
+  await Backend.emitEvent({missionId:State.currentMission?.id,actor:'Approval',type:decision==='approve'?'APPROVAL_GRANTED':'APPROVAL_REJECTED',detail:`Decision: ${decision.toUpperCase()}`,truthState:'SIMULATED'});
+  notify(decision==='approve'?'Approval granted':'Approval rejected',decision==='approve'?'success':'error');
+  render();
+}
+
+function stopMission(){State.engineRunning=false;if(State.currentMission){Backend.updateMission(State.currentMission.id,{executionState:'CANCELLED'});State.currentMission.executionState='CANCELLED'}notify('Mission stopped','error');render()}
+function pauseMission(){State.engineRunning=false;if(State.currentMission){Backend.updateMission(State.currentMission.id,{executionState:'PAUSED'});State.currentMission.executionState='PAUSED'}notify('Mission paused','info');render()}
+function resetDemo(){State.engineRunning=false;State.currentMission=null;State.currentView='command';State.selectedAgent=null;State.selectedTask=null;Backend.missions=[];Backend.tasks=[];Backend.events=[];Backend.approvals=[];Backend.artifacts=[];Backend.evidence=[];Backend.sequence=0;Backend.agents.forEach(a=>{a.status='IDLE';a.currentTask=null;a.progress=0;a.cost=0;a.tokenIn=0;a.tokenOut=0});showComposer();notify('Demo reset','info')}
+
+async function deleteMemory(id){await Backend.deleteMemory(id);render()}
+async function addMemory(){const cat=document.getElementById('memCat').value;const text=document.getElementById('memText').value.trim();if(!text)return;await Backend.addMemory({cat,text});document.getElementById('memText').value='';render()}
+
+function showNotification(msg,type){const el=document.getElementById('notification');el.textContent=msg;el.className='notification show '+(type||'info');setTimeout(()=>{el.className='notification'},3200)}
+const notify=showNotification;
+
+function updateCounts(){
+  const pending=Backend.approvals.filter(a=>a.executionState==='PENDING').length;
+  document.getElementById('approvalCount').textContent=pending;
+  const badge=document.getElementById('notifBadge');
+  badge.textContent=pending;badge.style.display=pending>0?'flex':'none';
+  document.getElementById('swarmCount').textContent=Backend.missions.length;
+  document.getElementById('agentCount').textContent=Backend.agents.length;
+}
+
+function attachViewHandlers(){
+  document.querySelectorAll('.trace-filter').forEach(btn=>{btn.onclick=()=>{State.traceFilter=btn.dataset.filter;render()}});
+}
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function formatTime(iso){return new Date(iso).toTimeString().substr(0,8)}
+function timeAgo(iso){const diff=Date.now()-new Date(iso).getTime();const mins=Math.floor(diff/60000);if(mins<1)return 'just now';if(mins<60)return mins+'m ago';const hrs=Math.floor(mins/60);if(hrs<24)return hrs+'h ago';return Math.floor(hrs/24)+'d ago'}
+function delay(ms){return new Promise(resolve=>setTimeout(resolve,ms))}
+
+document.getElementById('composerStart').addEventListener('click',startMissionFromComposer);
+document.getElementById('composerCancel').addEventListener('click',hideComposer);
+document.getElementById('composerOverlay').addEventListener('click',(e)=>{if(e.target===e.currentTarget)hideComposer()});
+document.querySelectorAll('.composer-mode').forEach(btn=>{btn.addEventListener('click',()=>{document.querySelectorAll('.composer-mode').forEach(b=>b.classList.remove('active'));btn.classList.add('active');State.missionMode=btn.dataset.mode})});
+document.querySelectorAll('.composer-quick-item').forEach(btn=>{btn.addEventListener('click',()=>{document.getElementById('composerInput').value=btn.dataset.goal})});
+document.querySelectorAll('.sidebar-item').forEach(item=>{item.addEventListener('click',()=>switchView(item.dataset.view));item.addEventListener('keydown',(e)=>{if(e.key==='Enter')switchView(item.dataset.view)})});
+document.querySelectorAll('.mobile-nav-item').forEach(item=>{item.addEventListener('click',()=>{document.querySelectorAll('.mobile-nav-item').forEach(i=>i.classList.remove('active'));item.classList.add('active');const view=item.dataset.mview;if(view==='home')switchView('command');else if(view==='swarms')switchView('missions');else if(view==='agents')switchView('agents');else if(view==='new')showComposer()})});
+document.addEventListener('keydown',(e)=>{if((e.metaKey||e.ctrlKey)&&e.key==='k'){e.preventDefault();openCommandPalette()}if(e.key==='Escape'){hideComposer();closeCommandPalette()}});
+document.getElementById('notifBtn').addEventListener('click',()=>switchView('approvals'));
+
+const COMMANDS=[{id:'new-mission',label:'New Mission',shortcut:'⌘N',action:()=>showComposer()},{id:'pause',label:'Pause Mission',action:()=>pauseMission()},{id:'stop',label:'Stop Mission',action:()=>stopMission()},{id:'approvals',label:'Open Approvals',action:()=>switchView('approvals')},{id:'approve-next',label:'Approve Next Action',action:()=>{const p=Backend.approvals.find(a=>a.executionState==='PENDING');if(p)handleApproval(p.id,'approve')}},{id:'reject-next',label:'Reject Next Action',action:()=>{const p=Backend.approvals.find(a=>a.executionState==='PENDING');if(p)handleApproval(p.id,'reject')}},{id:'task-graph',label:'Open Task Graph',action:()=>switchView('command')},{id:'task-list',label:'Open Task List',action:()=>switchView('tasks')},{id:'activity',label:'Open Activity Trace',action:()=>switchView('command')},{id:'evidence',label:'Open Evidence',action:()=>switchView('evidence')},{id:'artifacts',label:'Open Artifacts',action:()=>switchView('artifacts')},{id:'agent-inspector',label:'Open Agent Inspector',action:()=>switchView('agents')},{id:'cost-inspector',label:'Open Cost Inspector',action:()=>switchView('costs')},{id:'models',label:'Open Model Fabric',action:()=>switchView('models')},{id:'policy',label:'Open Policy Engine',action:()=>switchView('policy')},{id:'memory',label:'Open Memory',action:()=>switchView('memory')},{id:'skills',label:'Open Skills',action:()=>switchView('skills')},{id:'mcp',label:'Open MCP / Tools',action:()=>switchView('mcp')},{id:'reset',label:'Reset Demo',action:()=>resetDemo()},{id:'website',label:'Back to Website',action:()=>toggleView()}];
+
+let cmdFocusedIndex=0;
+function openCommandPalette(){document.getElementById('cmdOverlay').classList.add('active');document.getElementById('cmdInput').value='';document.getElementById('cmdInput').focus();cmdFocusedIndex=0;renderCommands('')}
+function closeCommandPalette(){document.getElementById('cmdOverlay').classList.remove('active')}
+function renderCommands(query){const filtered=COMMANDS.filter(c=>c.label.toLowerCase().includes(query.toLowerCase()));const list=document.getElementById('cmdList');list.innerHTML=filtered.map((c,i)=>`<div class="cmd-item ${i===cmdFocusedIndex?'focused':''}" data-idx="${i}" onclick="executeCommand(${COMMANDS.indexOf(c)})" role="option"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>${c.label}${c.shortcut?`<span class="cmd-shortcut">${c.shortcut}</span>`:''}</div>`).join('')||'<div class="empty-state" style="padding:20px"><p>No commands found</p></div>'}
+function executeCommand(idx){if(COMMANDS[idx]){COMMANDS[idx].action();closeCommandPalette()}}
+document.getElementById('cmdInput').addEventListener('input',(e)=>{cmdFocusedIndex=0;renderCommands(e.target.value)});
+document.getElementById('cmdInput').addEventListener('keydown',(e)=>{const items=document.querySelectorAll('.cmd-item');if(e.key==='ArrowDown'){e.preventDefault();cmdFocusedIndex=Math.min(cmdFocusedIndex+1,items.length-1);renderCommands(document.getElementById('cmdInput').value)}if(e.key==='ArrowUp'){e.preventDefault();cmdFocusedIndex=Math.max(cmdFocusedIndex-1,0);renderCommands(document.getElementById('cmdInput').value)}if(e.key==='Enter'){e.preventDefault();const filtered=COMMANDS.filter(c=>c.label.toLowerCase().includes(document.getElementById('cmdInput').value.toLowerCase()));if(filtered[cmdFocusedIndex]){const idx=COMMANDS.indexOf(filtered[cmdFocusedIndex]);executeCommand(idx)}}});
+document.getElementById('cmdOverlay').addEventListener('click',(e)=>{if(e.target===e.currentTarget)closeCommandPalette()});
+
+render();
+</script>
+</body>
+</html>
