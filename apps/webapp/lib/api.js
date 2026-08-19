@@ -1,9 +1,28 @@
 export const API = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8787').replace(/\/$/, '');
 
 async function request(path, options = {}) {
+  // Get CSRF token from cookie if available
+  const csrfToken = document.cookie
+    .split('; ')
+    .find(row => row.startsWith('csrf-token='))
+    ?.split('=')[1];
+
+  const headers = { 
+    'Content-Type': 'application/json', 
+    ...(options.headers || {}) 
+  };
+
+  // Add CSRF token to header for state-changing methods
+  if (csrfToken && !options.headers?.['csrf-token'] && !options.headers?.['x-csrf-token']) {
+    const method = (options.method || 'GET').toUpperCase();
+    if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
+      headers['csrf-token'] = csrfToken;
+    }
+  }
+
   const res = await fetch(`${API}${path}`, {
     credentials: 'include',
-    headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
+    headers,
     ...options,
   });
   const body = await res.json().catch(() => null);

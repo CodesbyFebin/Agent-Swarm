@@ -4,6 +4,8 @@ import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import cookie from '@fastify/cookie';
 import rateLimit from '@fastify/rate-limit';
+import helmet from '@fastify/helmet';
+import csrf from '@fastify/csrf-protection';
 import { z } from 'zod';
 import pg from 'pg';
 import { pool, emitEvent, getMissionAggregate } from './db.js';
@@ -21,6 +23,33 @@ await app.register(cors, {
 });
 await app.register(cookie);
 await app.register(rateLimit, { max: 300, timeWindow: '1 minute' });
+await app.register(helmet, {
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:", "validator.swagger.io"],
+      scriptSrc: ["'self'"],
+      connectorSrc: ["'self'", "ws:", "wss:"],
+      fontSrc: ["'self'"],
+      objectSrc: ["'none'"],
+      mediaSrc: ["'self'"],
+      frameSrc: ["'none'"],
+    },
+  },
+  crossOriginEmbedderPolicy: true,
+  crossOriginOpenerPolicy: { policy: "same-origin" },
+  crossOriginResourcePolicy: { policy: "same-origin" },
+  dnsPrefetchControl: true,
+  frameguard: { action: "deny" },
+  hidePoweredBy: { setTo: "AgentSwarm 1.0.0" },
+  hsts: { maxAge: 31536000, includeSubDomains: true, preload: true },
+  ieNoOpen: true,
+  noSniff: true,
+  referrerPolicy: { policy: "strict-origin-when-cross-origin" },
+  xssProtection: true,
+});
+await app.register(csrf);
 
 function setSessionCookie(reply, token, expiresAt) {
   reply.setCookie(SESSION_COOKIE, token, {
