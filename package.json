@@ -3,7 +3,9 @@
   "private": true,
   "version": "0.2.0",
   "type": "module",
-  "workspaces": ["apps/*"],
+  "workspaces": [
+    "apps/*"
+  ],
   "scripts": {
     "dev": "concurrently -n api,worker,web -c auto \"npm run dev -w @agentswarm/api\" \"npm run dev -w @agentswarm/worker\" \"npm run dev -w @agentswarm/web\"",
     "dev:api": "npm run dev -w @agentswarm/api",
@@ -16,5 +18,8 @@
   },
   "devDependencies": {
     "concurrently": "^9.2.1"
+  },
+  "dependencies": {
+    "cron": "^4.4.0"
   }
 }
