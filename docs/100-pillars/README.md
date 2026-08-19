@@ -34,8 +34,9 @@ When adding a new pillar:
 
 ## List of Pillars
 
-(This list will be automatically generated or maintained separately. For now, we list the created pillars.)
-
 - 001-introduction.md
 - 002-architecture.md
 - 003-use-cases.md
+- 004-model-routing.md
+- 005-event-ledger.md
+- 006-verification-gates.md
