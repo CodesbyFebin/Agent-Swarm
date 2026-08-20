@@ -1,5 +1,6 @@
 import { Nav } from "@/components/Nav";
 import { Hero } from "@/components/Hero";
+import { CommandCentre } from "@/components/CommandCentre";
 import { Lifecycle } from "@/components/Lifecycle";
 import { Platform } from "@/components/Platform";
 import { Truth } from "@/components/Truth";
@@ -13,6 +14,7 @@ export default function Home() {
       <Nav />
       <main id="main">
         <Hero />
+        <CommandCentre />
         <Lifecycle />
         <Platform />
         <Truth />
