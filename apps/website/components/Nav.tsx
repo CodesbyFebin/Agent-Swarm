@@ -3,6 +3,8 @@ import { APP_URL, REPO_URL } from "@/lib/site";
 import { LogoMark } from "./Icons";
 
 const LINKS = [
+  ["/docs", "Docs"],
+  ["#command-centre", "Command Centre"],
   ["#platform", "Platform"],
   ["#truth", "What's live"],
   ["#use-cases", "Use cases"],
@@ -39,7 +41,7 @@ export function Nav() {
             href={APP_URL}
             className="rounded-md bg-orange px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#d14a18]"
           >
-            Open Command Centre
+            Launch App
           </a>
         </div>
       </div>
