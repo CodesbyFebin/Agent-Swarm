@@ -32,11 +32,13 @@ export const metadata: Metadata = {
     description: DESCRIPTION,
     url: SITE_URL,
     locale: "en_IN",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "AgentSwarm.in — governed AI workforce control plane" }],
   },
   twitter: {
     card: "summary_large_image",
     title: `${SITE_NAME} — AI Workforce Control Plane`,
     description: DESCRIPTION,
+    images: ["/opengraph-image"],
   },
 };
 
@@ -66,6 +68,14 @@ const jsonLd = {
       url: APP_URL,
       description:
         "Mission control application for AgentSwarm: create missions, watch a governed swarm of specialist agents execute them, approve consequential actions, and inspect the event ledger.",
+    },
+    {
+      "@type": "FAQPage",
+      "@id": `${SITE_URL}/#faq`,
+      mainEntity: [
+        { "@type": "Question", name: "What is AgentSwarm?", acceptedAnswer: { "@type": "Answer", text: "AgentSwarm is an open-source control plane for planning, dispatching, governing, and auditing work performed by specialist AI agents." } },
+        { "@type": "Question", name: "Does AgentSwarm support human approval?", acceptedAnswer: { "@type": "Answer", text: "Yes. Tasks can pause at approval gates before consequential actions continue, with decisions recorded in the mission event ledger." } },
+      ],
     },
   ],
 };
