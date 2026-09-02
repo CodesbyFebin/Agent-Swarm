@@ -1,5 +1,5 @@
 import './globals.css';
-import { useEffect } from 'react';
+import ServiceWorkerRegistration from '../components/ui/ServiceWorkerRegistration';
 
 export const metadata = {
   title: 'AgentSwarm Command Centre',
@@ -8,24 +8,12 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
-  useEffect(() => {
-    // Register service worker for PWA support
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
-          .then((registration) => {
-            console.log('ServiceWorker registration successful with scope: ', registration.scope);
-          })
-          .catch((error) => {
-            console.log('ServiceWorker registration failed: ', error);
-          });
-      });
-    }
-  }, []);
-
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <ServiceWorkerRegistration />
+        {children}
+      </body>
     </html>
   );
 }

@@ -1,4 +1,5 @@
 'use client';
+
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { api } from '../lib/api.js';
 
@@ -17,7 +18,7 @@ const fmtTime = (d) => d ? new Date(d).toLocaleTimeString([], { hour12:false }) 
 const duration = (start, end) => start ? Math.max(0, Math.floor((new Date(end || Date.now()) - new Date(start))/1000)) : 0;
 const fmtDuration = (s) => `${String(Math.floor(s/3600)).padStart(2,'0')}:${String(Math.floor((s%3600)/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
 
-function Logo(){ return <span className="logoMark"><i/><i/><i/><i/></span>; }
+function Logo(){ return <span className="logoMark"><i></i><i></i><i></i><i></i></span>; }
 function Chip({children, color='#8a8a94'}){ return <span className="chip" style={{color,borderColor:`${color}55`,background:`${color}14`}}>{children}</span>; }
 
 export default function App(){
@@ -132,6 +133,7 @@ export default function App(){
             {tab==='verification'&&<Verification rows={data.verification}/>}
           </div>
         </>}
+
         {error&&<div className="errorBar">{error}</div>}
       </main>
 
@@ -193,7 +195,7 @@ function Entry({goal,setGoal,mode,setMode,busy,createMission,health}){
     <div className="composer"><textarea value={goal} onChange={e=>setGoal(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();createMission();}}} placeholder="Describe a mission…"/><div className="composerFoot"><div className="modes">{MODES.map(m=><button className={mode===m?'on':''} key={m} onClick={()=>setMode(m)}>{m}</button>)}</div><button className="start" onClick={()=>createMission()} disabled={busy||goal.trim().length<3}>Start Mission →</button></div></div>
     <div className="quick">{['Research the AgentSwarm repository and produce an architecture report','Design a production API for multi-agent mission orchestration','Create a security review checklist for an AI worker runtime'].map(q=><button key={q} onClick={()=>createMission(q)}>{q}</button>)}</div>
     <div className="truth"><Chip color={health?.status==='LIVE'?'#4ade80':'#f87171'}>API {health?.status||'UNKNOWN'}</Chip><Chip color={health?.qwen==='CONFIGURED'?'#4ade80':'#fbbf24'}>MODEL {health?.qwen||'UNKNOWN'}</Chip><span>Mission execution starts only when a real model provider is configured.</span></div>
-  </div>
+  </div>;
 }
 function Stat({label,value,bar}){return <div className="stat"><span>{label}</span><b>{value}</b>{bar!==undefined&&<div className="bar"><i style={{width:`${bar}%`}}/></div>}</div>}
 function TaskGraph({tasks}){ if(!tasks.length)return <div className="empty">Planning has not produced tasks yet.</div>; return <div className="graph">{tasks.map((t,i)=><React.Fragment key={t.id}><div className="taskNode" style={{borderColor:`${STATUS_COLOR[t.status]||'#71717a'}88`}}><div><span className="statusDot" style={{background:STATUS_COLOR[t.status]||'#71717a'}}/><b>{t.title}</b></div><small>{t.agent} · {t.task_key}</small><div className="bar"><i style={{width:`${t.progress}%`,background:STATUS_COLOR[t.status]||'#71717a'}}/></div><div className="nodeFoot"><Chip color={STATUS_COLOR[t.status]||'#71717a'}>{t.status}</Chip><span>{Array.isArray(t.dependencies)?t.dependencies.length:0} deps</span></div></div>{i<tasks.length-1&&<div className="arrow">→</div>}</React.Fragment>)}</div>}

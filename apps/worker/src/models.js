@@ -15,7 +15,7 @@ const MODEL_CONFIG_SCHEMA = z.object({
   temperature: z.number().default(0.7),
   latencyMs: z.number().optional(),
   costPer1k: z.number().optional(),
-  status: z.enum(['LIVE', 'UNAVAILABLE', 'DEGRADED']).default('UNAVAILABLE')
+  status: z.enum(['LIVE', 'UNAVAILABLE', 'DEGRADED', 'CONFIGURED']).default('UNAVAILABLE')
 });
 
 class ModelRouter {
@@ -52,11 +52,11 @@ class ModelRouter {
   // Route to appropriate model based on policy
   async route(prompt, options = {}) {
     const { policy = 'AUTO', requiredCapabilities = [], context = {} } = options;
-
     // Get available models matching capabilities
     const candidates = Array.from(this.models.values())
-      .filter(m => m.capabilities.some(c => requiredCapabilities.includes(c)));
+      .filter(m => requiredCapabilities.length === 0 || m.capabilities.some(c => requiredCapabilities.includes(c)));
 
+    // If no candidates match, throw error
     if (!candidates.length) {
       throw new Error('No models available for required capabilities');
     }
@@ -193,6 +193,21 @@ export function initDefaultModels() {
       maxTokens: 8000,
       temperature: 0.7,
       status: 'CONFIGURED'
+    });
+  }
+
+  // MiniMax model (if configured)
+  if (process.env.MINIMAX_API_KEY && process.env.MINIMAX_BASE_URL) {
+    modelRouter.registerModel({
+      name: process.env.MINIMAX_MODEL_NAME || "abab6.5s-chat",
+      provider: "minimax",
+      baseUrl: process.env.MINIMAX_BASE_URL,
+      apiKey: process.env.MINIMAX_API_KEY,
+      modelName: process.env.MINIMAX_MODEL || "abab6.5s-chat",
+      capabilities: ["reasoning", "coding", "analysis"],
+      maxTokens: 8000,
+      temperature: 0.2,
+      status: "CONFIGURED"
     });
   }
 
